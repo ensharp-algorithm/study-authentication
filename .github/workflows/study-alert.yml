@@ -1,0 +1,42 @@
+name: Study Problem Check Alert
+
+on:
+  schedule:
+    # KST 22:00 -> UTC 13:00 (9시간 차이)
+    # 월(1), 수(3), 금(5) 매주 밤 10시에 실행
+    - cron: '0 13 * * 1,3,5'
+
+jobs:
+  check-and-alert:
+    runs-on: ubuntu-latest
+    steps:
+      # 1. 저장소 체크아웃
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      # 2. 파이썬 환경 세팅
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      # 3. 시간에 맞게 스크립트 실행
+      - name: Run Check Script
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        run: |
+          DAY_OF_WEEK=$(date +%u)
+          
+          # 1 = 월요일 (토, 일, 월 3일 검사 -> 72시간)
+          if [ "$DAY_OF_WEEK" -eq 1 ]; then
+            HOURS=72
+          # 3 = 수요일 (화, 수 2일 검사 -> 48시간)
+          # 5 = 금요일 (목, 금 2일 검사 -> 48시간)
+          else
+            HOURS=48
+          fi
+          
+          echo "Checking past $HOURS hours for Day $DAY_OF_WEEK..."
+          python .github/scripts/check_solved.py $HOURS $DAY_OF_WEEK
