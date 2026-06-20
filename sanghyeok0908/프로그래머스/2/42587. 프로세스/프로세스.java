@@ -4,32 +4,31 @@ class Solution {
     
     public int solution(int[] priorities, int location) {
         Queue<int[]> queue = new ArrayDeque<>();
-        int n = priorities.length;
-        int cnt = 0;
         
-        for (int i = 0; i < n; i++) {
-            queue.add(new int[]{i, priorities[i]});
+        for (int i = 0; i < priorities.length; i++) {
+            queue.add(new int[] {i, priorities[i]});
         }
         
+        int cnt = 0;
         while(!queue.isEmpty()) {
-            int[] poll = queue.poll();
-            boolean isNotYet = false;
+            int[] cur = queue.poll();
+            boolean isFirst = true;
             
-            for (int[] i : queue) {
-                if (poll[1] < i[1]) {
-                    isNotYet = true;
+            for (int[] q : queue) {
+                if (cur[1] < q[1]) {
+                    isFirst = false;        
                     break;
                 }
             }
             
-            if (isNotYet) {
-                queue.add(poll);
-            } else {
+            if (isFirst) {
                 cnt++;
                 
-                if (poll[0] == location) {
+                if (cur[0] == location) {
                     return cnt;
-                }   
+                }
+            } else {
+                queue.add(cur);
             }
         }
         return -1;
