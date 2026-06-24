@@ -15,7 +15,11 @@ result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
 
 # 지원하는 확장자 필터링
 extensions = ('.java', '.py', '.cpp', '.c', '.js')
-files = [f.strip() for f in result.stdout.split('\n') if f.strip() and f.endswith(extensions)]
+files = []
+for f in result.stdout.split('\n'):
+    clean_path = f.strip().strip('"') # 양끝 공백과 큰따옴표 제거
+    if clean_path and clean_path.endswith(extensions):
+        files.append(clean_path)
 
 # 3. 사용자별 풀이 수 계산
 user_counts = {}

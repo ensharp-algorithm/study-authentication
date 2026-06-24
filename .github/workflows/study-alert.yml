@@ -28,6 +28,8 @@ jobs:
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         run: |
+          git config --global core.quotepath false
+
           DAY_OF_WEEK=$(date +%u)
           
           # 1 = 월요일 (토, 일, 월 3일 검사 -> 72시간)
