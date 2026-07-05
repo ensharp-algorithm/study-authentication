@@ -1,40 +1,41 @@
+import java.util.*;
+
 class Solution {
     
-    char[] original, target;
-    int n;
-    int answer;
-    
     public int solution(String name) {
-        answer = 0;
-        n = name.length();
+        int answer = 0;
+        int n = name.length();
+        int min = n-1;
         
-        original = createOriginal(n);
-        target = name.toCharArray();
-        
-        int move = n - 1;
         for (int i = 0; i < n; i++) {
-            int temp = target[i] - original[i];
-            answer += temp > 13 ? 26 - temp : temp;
+            // up down
+            int value = (int) name.charAt(i) - 'A';
+            value = 26 - value < value ? 26 - value : value;
+            answer += value;
             
+            // if (value == 0) {
+            //     continue;
+            // }
+            
+            // side
             int next = i + 1;
-            while(next < n && target[next] == 'A') {
+            while(next < n && name.charAt(next) == 'A') {
                 next++;
             }
             
-            int left = i;
-            int right = n - next;
-            int minTurn = left + right + Math.min(left, right);
-            move = Math.min(move, minTurn);
+            // if (next >= n) {
+            //     break;
+            // }
+            
+            // 오른쪽 갔다가 왼쪽
+            int rightAndLeft = i * 2 + n - next;
+            
+            // 왼쪽 갔다가 오른쪽
+            int leftAndRight = (n - next) * 2 + i;
+            
+            min = Math.min(min,  Math.min(rightAndLeft, leftAndRight));
+            
         }
-        return answer + move;
-    }
-    
-    char[] createOriginal(int length) {
-        char[] result = new char[length];
-        
-        for (int i = 0; i < length; i++) {
-            result[i] = 'A';
-        }
-        return result;
+        return answer + min;
     }
 }
