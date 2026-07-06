@@ -14,22 +14,13 @@ class Solution {
         
         int n = people.length;
         int i = 0 ;
-        // 0 1 2 
         
         for (int j = n-1; j >= i ;j--){
             if (people[i] + people[j] <= limit){
                 i++;
             }
-            
-            
             answer++;
         }
-        
-        
-        
-        
-        
-        
         return answer;
     }
 }
