@@ -6,28 +6,44 @@ import urllib.request
 from datetime import datetime, timezone
 
 # 1. 인자 및 환경변수 로드
-hours_back = sys.argv[1]  # Actions에서 넘겨줄 시간 (48 또는 72)
+hours_back = int(sys.argv[1])  # Actions에서 넘겨줄 시간 (48 또는 72)
 webhook_url = os.environ.get("DISCORD_WEBHOOK")
 target_count = 2
 BAR_LENGTH = 5  # 프로그레스 바 칸 수
 
-# 2. 지정된 시간 내에 '추가(A) 또는 수정(M)된' 소스코드 파일 목록 추출
-cmd = f"git log --since='{hours_back} hours ago' --name-only --pretty=format: --diff-filter=AM"
-result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
+# 점검 시작 기준시각(UTC). 각 커밋의 커밋시각과 절대시간으로 직접 비교한다.
+cutoff_ts = datetime.now(timezone.utc).timestamp() - hours_back * 3600
 
-# 지원하는 확장자 필터링
-extensions = ('.java', '.py', '.cpp', '.c', '.js')
-files = []
-for f in result.stdout.split('\n'):
-    clean_path = f.strip().strip('"')  # 양끝 공백과 큰따옴표 제거
-    if clean_path and clean_path.endswith(extensions):
-        files.append(clean_path)
+# 2. '추가(A) 또는 수정(M)된' 소스코드 파일 목록 추출
+#    - git 기본 --since 는 "날짜보다 오래된 첫 커밋"을 만나면 순회를 멈추기 때문에,
+#      (auto-sync/rebase 등으로) 커밋 시각이 역전되면 범위 안의 커밋을 통째로 건너뛴다.
+#    - 그래서 전체 커밋을 나열하되 커밋시각(%ct)을 함께 뽑아 Python에서 직접 필터링한다.
+COMMIT_MARK = "@@COMMIT@@"  # 커밋 경계 표시(파일 경로 맨 앞에 나올 일이 없는 값)
+cmd = [
+    "git", "log",
+    "--name-only", "--diff-filter=AM",
+    f"--pretty=format:{COMMIT_MARK}%ct",
+]
+result = subprocess.run(cmd, capture_output=True, text=True)
 
-# 3. 사용자별 풀이 수 계산 (같은 파일을 여러 커밋에 걸쳐 수정해도 1문제로만 집계)
+# 3. 커밋 블록을 순회하며 '범위 안' 커밋의 파일만 사용자별로 집계
+#    (같은 파일을 여러 커밋에 걸쳐 수정해도 1문제로만 집계)
+# '.undefined' 는 SWEA 연동(auto-sync) 도구가 언어를 감지하지 못했을 때 붙이는 fallback
+# 확장자로, 실제 내용은 정상 풀이 소스코드다. 이걸 포함해야 SWEA 풀이도 집계된다.
+extensions = ('.java', '.py', '.cpp', '.c', '.js', '.undefined')
 user_files = {}
-for file_path in files:
-    user = file_path.split('/')[0]
-    user_files.setdefault(user, set()).add(file_path)
+in_window = False  # 현재 파싱 중인 커밋이 점검 범위 안인지 여부
+for raw in result.stdout.split('\n'):
+    if raw.startswith(COMMIT_MARK):  # 마커 판별은 strip 이전 원본 줄에서 수행
+        commit_ts = int(raw[len(COMMIT_MARK):])
+        in_window = commit_ts >= cutoff_ts
+        continue
+    if not in_window:
+        continue
+    clean_path = raw.strip().strip('"')  # 양끝 공백과 큰따옴표 제거
+    if clean_path and clean_path.endswith(extensions):
+        user = clean_path.split('/')[0]
+        user_files.setdefault(user, set()).add(clean_path)
 
 user_counts = {user: len(paths) for user, paths in user_files.items()}
 
@@ -73,7 +89,7 @@ if webhook_url:
     success_rate = round((success_n / total_users) * 100) if total_users else 0
 
     # 예쁘게 보여주기 위한 타이틀 설정
-    period_str = "토-일-월" if hours_back == "72" else ("화-수" if sys.argv[2] == "3" else "목-금")
+    period_str = "토-일-월" if hours_back == 72 else ("화-수" if sys.argv[2] == "3" else "목-금")
 
     # 전체 달성률에 따라 임베드 색상 변경
     if penalty_n == 0:
