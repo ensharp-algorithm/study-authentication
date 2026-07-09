@@ -1,0 +1,54 @@
+import java.util.*;
+import java.io.*;
+
+class Solution
+{
+    public static void main(String args[]) throws Exception
+    {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+
+        int T = Integer.parseInt(br.readLine());
+
+        for (int tc = 1; tc <= T; tc++){
+
+            int maxTotal = Integer.MIN_VALUE;
+
+            StringTokenizer st = new StringTokenizer(br.readLine());
+
+            int n = Integer.parseInt(st.nextToken());
+            int m = Integer.parseInt(st.nextToken());
+
+            int[] A = new int[n];
+            int[] B = new int[m];
+
+            st = new StringTokenizer(br.readLine());
+
+            for (int i = 0; i < n; i++) {
+                A[i] = Integer.parseInt(st.nextToken());
+            }
+
+            st = new StringTokenizer(br.readLine());
+
+            for (int i = 0; i < m; i++) {
+                B[i] = Integer.parseInt(st.nextToken());
+            }
+
+            int[] longArr = n >= m ? A : B;
+            int[] shortArr = n >= m ? B : A;
+
+            for (int i = 0; i <= longArr.length - shortArr.length; i++) {
+                int total = 0;
+
+                for (int j = 0; j < shortArr.length; j++) {
+                    total += longArr[i + j] * shortArr[j];
+                }
+
+                maxTotal = Math.max(maxTotal, total);
+            }
+            
+            
+            
+            System.out.println("#" + tc + " " + maxTotal);
+        }
+    }
+}
