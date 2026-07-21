@@ -1,0 +1,179 @@
+
+import java.io.*;
+import java.util.*;
+
+
+public class Solution {
+	
+	static boolean [][] visited;
+	static int[][] board;
+	static int N;
+	static int total;
+	static Queue<Node> queue;
+	
+	//상 하 좌 우 좌측상단대각선 좌측하단대각선, 우측상단대각선, 우측하단대각선
+	static int[] dRow = {1,-1,0,0,1,-1,1,-1};
+	static int[] dCol = {0,0,-1,1,-1,-1,1,1};
+
+	private static class Node{
+		int row;
+		int col;
+		
+		Node(int row, int col){
+			this.row = row;
+			this.col = col;
+		}
+	}
+
+	public static void main(String[] args) throws IOException {
+	
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		
+		int T = Integer.parseInt(br.readLine());
+		
+		for (int tc = 1; tc <= T; tc++) {
+			
+			N = Integer.parseInt(br.readLine());
+			visited = new boolean[N][N];
+			board = new int[N][N];
+			total = 0;
+			queue = new ArrayDeque<>();
+			
+			
+			for (int i = 0; i < N; i++) {
+				String str = br.readLine();
+				
+				for (int j = 0; j <N; j++) {
+					
+					// 지뢰 = -1
+					if (str.charAt(j) == '*'){
+						board[i][j] = -1;
+					}
+					else
+					{
+						board[i][j] = -2;
+					}
+				}
+			}
+			
+			
+			for (int i = 0; i < N; i++) {
+				for (int j = 0; j <N; j++) {
+					if (board[i][j]== -2) {
+						board[i][j] = countBoom(new Node(i,j));
+					}
+				}
+			}
+//			
+//			for (int i = 0; i < N; i++) {
+//				for (int j = 0; j <N; j++) {
+//					System.out.print(board[i][j] + " ");
+//				}
+//				System.out.println();
+//			}
+			
+			
+			bfs();
+			
+//			for (int i = 0; i < N; i++) {
+//				for (int j = 0; j <N; j++) {
+//					
+//					if (board[i][j] == -1) {
+//						System.out.print("* ");
+//					}
+//					if (!visited[i][j]) {
+//						System.out.print("N ");
+//					}
+//					if (visited[i][j]) {
+//						System.out.print("Y ");
+//					}
+//				}
+//				System.out.println();
+//			}
+			
+			for (int i = 0; i < N; i++) {
+				for (int j = 0; j <N; j++) {
+					if (!visited[i][j] && board[i][j] != -1) {
+						total++;
+					}
+				}
+			}
+	
+			System.out.println("#" + tc + " " + total);
+		}
+		
+		
+		
+	}
+	
+	
+	
+	
+	private static void bfs() {
+		
+		for (int i = 0; i<N;i++) {
+			for (int j = 0; j <N; j++) {
+		
+				
+				if (board[i][j] == 0&& !visited[i][j]) {
+					
+					visited[i][j] = true;
+					total++;
+					
+//					System.out.println("total++ " + total);
+					queue.offer(new Node(i,j));
+				}
+				
+				while(!queue.isEmpty()) {
+					Node current = queue.poll();
+					
+					for (int k = 0; k <8; k++) {
+						
+						int nextRow = current.row + dRow[k];
+						int nextCol = current.col + dCol[k];
+						
+						if (nextRow <0 || nextRow >= N || nextCol < 0 || nextCol >= N) {
+							continue;
+						}
+						
+						if (visited[nextRow][nextCol]) {
+							continue;
+						}
+						
+						
+						visited[nextRow][nextCol] = true;
+						
+						//0이 나오면 큐에 넣음 
+						if (board[nextRow][nextCol]== 0) {
+							Node next = new Node(nextRow,nextCol);
+							queue.offer(next);
+						}
+					}
+				}
+				
+			}
+		}
+	}
+	
+	
+	private static int countBoom(Node current) {
+		
+		int cnt = 0;
+		
+		for (int i = 0; i <8; i++) {
+			int nextRow = current.row + dRow[i];
+			int nextCol = current.col + dCol[i];
+			
+			if (nextRow <0 || nextRow >= N || nextCol < 0 || nextCol >= N) {
+				continue;
+			}
+			
+			if (board[nextRow][nextCol]== -1) {
+				cnt++;
+			}
+			
+		}
+		
+		return cnt;
+	}
+}
