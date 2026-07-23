@@ -4,23 +4,30 @@ class Solution {
     
     public int solution(int[][] triangle) {
         int height = triangle.length;
-        int weight = triangle[height - 1].length;
         int[][] dp = new int[height][];
         
         for (int i = 0; i < height; i++) {
             dp[i] = new int[triangle[i].length];
         }
-        for (int i = 0; i < weight; i++) {
-            dp[height - 1][i] = triangle[height - 1][i];
-        }
+        dp[0][0] = triangle[0][0];
         
-        for (int i = height - 2; i >= 0; i--) {
-            for (int j = 0; j < dp[i].length; j++) {
-                dp[i][j] = Math.max(dp[i + 1][j], dp[i + 1][j + 1]) + triangle[i][j];
-                // System.out.printf("%d %d %d\n", dp[i + 1][j], dp[i + 1][j + 1], triangle[i][j]);
+        for (int i = 1; i < height; i++) {
+            int w = dp[i].length;
+            dp[i][0] = dp[i - 1][0] + triangle[i][0];
+            dp[i][w - 1] = dp[i - 1][w - 2] + triangle[i][w - 1];
+            
+            for (int j = 1; j < w - 1; j++) {
+                dp[i][j] = Math.max(dp[i - 1][j - 1], dp[i - 1][j]) + triangle[i][j];
+                // System.out.printf("%d %d\n", dp[i - 1][j], triangle[i][j]);
             }
         }
         
-        return dp[0][0];
+        int max = 0;
+        for (int i = 0; i < triangle[height - 1].length; i++) {
+            if (dp[height - 1][i] > max) {
+                max = dp[height - 1][i];
+            }
+        }
+        return max;
     }
 }
