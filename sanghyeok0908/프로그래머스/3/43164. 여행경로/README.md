@@ -1,10 +1,10 @@
 # [level 3] 여행경로 - 43164 
 
-[문제 링크](https://school.programmers.co.kr/learn/courses/30/lessons/43164) 
+[문제 링크](https://school.programmers.co.kr/learn/courses/30/lessons/43164#) 
 
 ### 성능 요약
 
-메모리: 81 MB, 시간: 0.65 ms
+메모리: 84.4 MB, 시간: 0.32 ms
 
 ### 구분
 
@@ -16,7 +16,7 @@
 
 ### 제출 일자
 
-2026년 04월 22일 17:57:45
+2026년 07월 23일 23:34:05
 
 ### 문제 설명
 

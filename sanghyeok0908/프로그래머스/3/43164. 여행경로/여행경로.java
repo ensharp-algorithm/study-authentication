@@ -2,42 +2,33 @@ import java.util.*;
 
 class Solution {
     
-    List<String> answer = new ArrayList<>();
-    boolean[] visited;
-    int n;
+    Map<String, Queue<String>> map = new HashMap<>();
+    List<String> result = new ArrayList<>();
     
     public String[] solution(String[][] tickets) {
-        n = tickets.length;
-        visited = new boolean[n];
+        for (String[] ticket : tickets) {
+            Queue<String> q = map.getOrDefault(ticket[0], new PriorityQueue<>());
+            q.add(ticket[1]);
+            
+            map.put(ticket[0], q);
+        }
         
-        Arrays.sort(tickets, (o1, o2) -> o1[1].compareTo(o2[1]));
+        dfs("ICN");
         
-        String from = "ICN";
-        answer.add(from);
-        dfs(tickets, from, 0);
-        
-        return answer.toArray(new String[0]);
+        String[] answer = new String[result.size()];
+        for (int i = 0; i < answer.length; i++) {
+            answer[i] = result.get(answer.length - 1 - i);
+        }
+        return answer;
     }
     
-    boolean dfs(String[][] tickets, String from, int cnt) {
-        if (cnt == n) {
-            return true;
+    void dfs(String airport) { 
+        Queue<String> q = map.get(airport);
+        
+        while(q != null && !q.isEmpty()) {
+            dfs(q.poll());
         }
         
-        for (int i = 0; i < n; i++) {
-            if (visited[i] || !tickets[i][0].equals(from)) {
-                continue;
-            }
-            
-            visited[i] = true;
-            answer.add(tickets[i][1]);
-            if (dfs(tickets, tickets[i][1], cnt + 1)) {
-                return true;
-            }
-            
-            visited[i] = false;
-            answer.remove(answer.size() - 1);
-        }
-        return false;
+        result.add(airport);
     }
 }
