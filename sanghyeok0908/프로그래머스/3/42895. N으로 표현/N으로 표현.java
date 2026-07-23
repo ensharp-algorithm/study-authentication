@@ -3,45 +3,45 @@ import java.util.*;
 class Solution {
 
     public int solution(int N, int number) {
+        Set<Long>[] dp = new HashSet[9];
+        
         if (N == number) {
             return 1;
         }
-
-        Set<Integer>[] set = new HashSet[9];
         
         for (int i = 1; i <= 8; i++) {
-            set[i] = new HashSet<>();
-            set[i].add(createSameNum(N, i));
+            dp[i] = new HashSet<>();
         }
         
-        for (int i = 2; i <= 8; i++) {
+        long num = 0;
+        for (int i = 1; i <= 8; i++) {
+            num = num * 10 + N;
+            dp[i].add(num);
+            
             for (int j = 1; j < i; j++) {
-                int k = i - j;
-                
-                for (int num1 : set[j]) {
-                    for (int num2 : set[k]) {
-                        set[i].add(num1 + num2);
-                        set[i].add(num1 - num2);
-                        set[i].add(num1 * num2);
-                        if (num2 != 0) {
-                            set[i].add(num1 / num2);
+                for (long a : dp[j]) {
+                    for (long b : dp[i - j]) {
+                        dp[i].add(a + b);
+                        dp[i].add(a - b);
+                        dp[i].add(a * b);
+                        if (b > 0) {
+                            dp[i].add(a / b);
                         }
                     }
                 }
             }
             
-            if (set[i].contains(number)) {
+            if (dp[i].contains((long)number)) {
                 return i;
             }
+            
+            // System.out.println("i = " + i);
+            // for (int num : dp[i]) {
+            //     System.out.print(num + " ");
+            // }
+            // System.out.println();
         }
+        
         return -1;
-    }
-    
-    int createSameNum(int N, int size) {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < size; i++) {
-            sb.append(N);
-        }
-        return Integer.parseInt(sb.toString());
     }
 }
