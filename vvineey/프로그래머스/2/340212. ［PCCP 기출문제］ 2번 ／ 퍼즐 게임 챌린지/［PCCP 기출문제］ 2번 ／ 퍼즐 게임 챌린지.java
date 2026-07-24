@@ -60,14 +60,11 @@ class Solution {
             int diff = diffs[i];
             int time_cur = times[i];
             int time_prev = (i == 0) ? 0 : times[i-1];
+            int cnt = (diff<= level) ? 0 : diff-level;
             
-            if (diff <= level) {
-                total += time_cur;
-            }
+          
+            total += ((cnt * (time_cur + time_prev)) + time_cur);
             
-            else{
-                total += (((diff-level) * (time_cur + time_prev)) + time_cur);
-            }
             
             if (total > limit){
                 return false;
