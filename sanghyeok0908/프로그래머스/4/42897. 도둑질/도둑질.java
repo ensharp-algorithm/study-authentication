@@ -1,23 +1,18 @@
 class Solution {
     
-    int n;
-    
     public int solution(int[] money) {
-        n = money.length;
-        return Math.max(dp(money, 0, n - 2), dp(money, 1, n - 1));
-    }
-    
-    int dp(int[] money, int start, int end) {
-        int take = 0; // 직전 집을 턴 경우의 최댓값
-        int skip = 0; // 직전 집을 털지 않은 경우의 최댓값
+        int n = money.length;
+        int[][] dp = new int[2][money.length];
         
-        for (int i = start; i <= end; i++) {
-            int nextTake = skip + money[i];
-            int nextSkip = Math.max(skip, take);
-            
-            take = nextTake;
-            skip = nextSkip;
+        dp[0][0] = money[0];
+        dp[0][1] = money[0];
+        dp[1][0] = 0;
+        dp[1][1] = money[1];
+        
+        for (int i = 2; i < n; i++) {
+            dp[0][i] = Math.max(money[i] + dp[0][i - 2], dp[0][i - 1]);
+            dp[1][i] = Math.max(money[i] + dp[1][i - 2], dp[1][i - 1]);
         }
-        return Math.max(skip, take);
+        return Math.max(dp[0][n - 2], dp[1][n - 1]);
     }
 }
