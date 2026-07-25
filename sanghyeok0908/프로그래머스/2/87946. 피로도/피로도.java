@@ -17,6 +17,8 @@ class Solution {
     }
     
     void dfs(int cur, int cnt) {
+        answer = Math.max(answer, cnt);
+        
         for (int i = 0; i < n; i++) {
             if (visited[i] || dungeons[i][0] > cur) {
                 continue;
@@ -27,6 +29,6 @@ class Solution {
             visited[i] = false;
         }
         
-        answer = Math.max(answer, cnt);
+        // answer = Math.max(answer, cnt);
     }
 }
