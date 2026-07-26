@@ -1,35 +1,31 @@
 import java.util.*;
-import java.io.*;
-
 
 class Solution {
     public String solution(int[] numbers) {
-     
-        String [] arr = new String[numbers.length];
-        String answer = "000";
+    
+        String[] nums = new String[numbers.length];
+        StringBuilder sb = new StringBuilder();
         
-        int cnt = 0;
-        for (int n : numbers){
-            arr[cnt++] = String.valueOf(n);
-        } 
+        for (int i = 0; i < numbers.length; i++) {
+            nums[i] = String.valueOf(numbers[i]);
+        }  
         
-        Arrays.sort(arr,(o1,o2)->
-                   (o2+o1).compareTo(o1+o2));
+        Arrays.sort(nums, (o1,o2) -> {
+          return (o2 + o1).compareTo(o1 + o2); 
+        });
         
-        if (arr[0].equals("0")){
+        if (nums[0].equals("0")){
             return "0";
         }
         
-        
-        StringBuilder sb = new StringBuilder();
-        
-        for (String s : arr){
+        for (String s : nums){
             sb.append(s);
         }
         
-        
+//         System.out.println(sb.toString());
         
         return sb.toString();
-        
     }
+    
+    
 }
