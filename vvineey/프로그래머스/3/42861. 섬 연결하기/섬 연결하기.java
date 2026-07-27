@@ -26,11 +26,8 @@ class Solution {
            if (o1[2] != o2[2]){
                return Integer.compare(o1[2], o2[2]);
             }
-            if (o1[0] != o2[0]) {
-                return Integer.compare(o1[0], o2[0]);
-            }
-            return Integer.compare(o1[1], o2[1]);
             
+            return Integer.compare(o1[0], o2[0]);
         });
 
         root = new int[n];
