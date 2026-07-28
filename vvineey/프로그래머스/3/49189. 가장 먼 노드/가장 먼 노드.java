@@ -3,7 +3,7 @@ import java.util.*;
 class Solution {
 
     static int[] distance;
-    static List<int[]>[] graph;
+    static List<Integer>[] graph;
 
     public int solution(int n, int[][] edge) {
         
@@ -19,17 +19,11 @@ class Solution {
             int v1 = row[0];
             int v2 = row[1];
             
-            graph[v1].add(new int[]{v2,1});
-            graph[v2].add(new int[]{v1,1});
+            graph[v1].add(v2);
+            graph[v2].add(v1);
         }
-        
-        dijkstra(1);
-        
-        // System.out.println("---------");
-        // for (int i : distance ){
-        //     System.out.print(i + " ");
-        // }
-        // System.out.println("\n---------");
+    
+        bfs(1);
     
         int maxNum = Integer.MIN_VALUE;
         
@@ -38,47 +32,39 @@ class Solution {
         }
         
         int cnt = 0;
+        
         for (int i = 1; i < distance.length;i++){
             if (distance[i] == maxNum){ cnt++;}
         }
         
         return cnt;
     }
+
     
-    private void dijkstra (int start){
-        Arrays.fill(distance, Integer.MAX_VALUE);
+    private void bfs(int start){
+        Arrays.fill(distance, -1);
         
-        PriorityQueue<int[]> queue = new PriorityQueue<>((o1,o2)->{
-            if (o1[1] != o2[1]){
-                return Integer.compare(o1[1],o2[1]);
-            }
-            
-            return Integer.compare(o1[0],o2[0]);
-        });
-        
-        queue.offer(new int[]{start,0});
+        Queue<Integer> queue = new ArrayDeque<>();
+        queue.offer(start);
         distance[start] = 0;
         
         while(!queue.isEmpty()){
+            int current = queue.poll();
+//             System.out.println(current);
             
-            int[] currentNode = queue.poll();
-
-            if (currentNode[1] > distance[currentNode[0]]) {
-                continue;
-            }
+//             for (int i = 1; i<distance.length;i++){
+//                 System.out.print(distance[i] + " ");
+//             }
+//             System.out.println();
             
-            for (int[] edge : graph[currentNode[0]]){
-
-                if (distance[edge[0]] > currentNode[1] + edge[1]){
-                    distance[edge[0]] = currentNode[1] + edge[1]; //갱신
-                    queue.offer(new int[]{edge[0], currentNode[1] + edge[1]});
+            for (int adj : graph[current]) {
+                            
+                if (distance[adj] != -1){
+                    continue;
                 }
-                
-                // for (int i = 1; i < distance.length;i++){
-                //     System.out.print(distance[i] + " ");
-                // }
-                // System.out.println();
+                distance[adj] = distance[current]+1;
+                queue.offer(adj);
             }
-        }  
+        }
     }
 }
