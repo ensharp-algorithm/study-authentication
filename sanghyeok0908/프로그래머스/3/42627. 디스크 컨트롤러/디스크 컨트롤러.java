@@ -1,72 +1,70 @@
 import java.util.*;
-import java.util.stream.*;
 
 class Solution {
     
     public int solution(int[][] jobs) {
-        // {idx, requestTime, jobTime}
-        Queue<int[]> initQ = new PriorityQueue<>((a, b) -> {
-           if (a[1] < b[1]) {
-               return -1;
-           } else if (a[1] > b[1]) {
-               return 1;
-           } 
-           
-           if (a[2] < b[2]) {
-               return -1;
-           } else if (a[2] > b[2]) {
-               return 1;
+        Queue<int[]> waitQ = new PriorityQueue<>((o1, o2) -> {
+            // 요청 시간
+           if (o1[1] != o2[1]) {
+               return Integer.compare(o1[1], o2[1]);
            }
-           
-           return a[0] - b[0];
-       });
-        Queue<int[]> waitQ = new PriorityQueue<>((a, b) -> {
-           if (a[2] < b[2]) {
-               return -1;
-           } else if (a[2] > b[2]) {
-               return 1;
-           } 
-           
-           if (a[1] < b[1]) {
-               return -1;
-           } else if (a[1] > b[1]) {
-               return 1;
+            // 소요시간
+           if (o1[2] != o2[2]) {
+               return Integer.compare(o1[2], o2[2]);
            }
-           
-           return a[0] - b[0];
-       });
-        
+            // 작업 번호
+           return Integer.compare(o1[0], o2[0]);
+        });
+        Queue<int[]> processQ = new PriorityQueue<>((o1, o2) -> {
+            // 소요 시간
+           if (o1[2] != o2[2]) {
+               return Integer.compare(o1[2], o2[2]);
+           }
+            // 요청 시간
+           if (o1[1] != o2[1]) {
+               return Integer.compare(o1[1], o2[1]);
+           }
+            // 작업 번호
+           return Integer.compare(o1[0], o2[0]);
+        });
+        List<Integer> result = new ArrayList<>();
+            
         for (int i = 0; i < jobs.length; i++) {
-            initQ.add(new int[]{i, jobs[i][0], jobs[i][1]});
+            waitQ.add(new int[] { i, jobs[i][0], jobs[i][1] });
         }
         
         int curTime = 0;
-        int timeSum = 0;
-        while(!initQ.isEmpty() || !waitQ.isEmpty()) {
-            // 아직 initQ에 작업이 있지만, 요청시간이 curTime보다 클 때
-            if (!initQ.isEmpty() && curTime < initQ.peek()[1] && waitQ.isEmpty()) {
-                curTime = initQ.peek()[1];   
+        int nextTime = 0;
+        while(!waitQ.isEmpty() || !processQ.isEmpty()) {
+            // System.out.println("curTime = " + curTime);
+            
+            while (curTime >= nextTime && 
+                   !waitQ.isEmpty() && 
+                   curTime >= waitQ.peek()[1]) {
+                int[] poll = waitQ.poll();
+                processQ.add(poll);
+                // System.out.printf("add processQ %d %d %d\n", poll[0], poll[1], poll[2]);
             }
             
-            // initQ에서 waitQ로 job 넣기
-            while (!initQ.isEmpty() && initQ.peek()[1] <= curTime) {
-                System.out.printf("initQ poll, curTime = %d\n", curTime);
-                waitQ.add(initQ.poll());
+            if (curTime >= nextTime && !processQ.isEmpty()) {
+                int[] poll = processQ.poll();
+                nextTime = curTime + poll[2];
+                result.add(nextTime - poll[1]);
             }
             
-            // waitQ에서 작업할 job 빼기
-            if (!waitQ.isEmpty()) {
-                int[] curJob = waitQ.poll();
-                System.out.printf("waitQ poll, curTime = %d, idx = %d\n", curTime, curJob[0]);
-                
-                // job 수행
-                System.out.println("job processing");
-                System.out.printf("before curTime = %d\n", curTime);
-                curTime += curJob[2];
-                timeSum += curTime - curJob[1];
-                System.out.printf("after curTime = %d\n", curTime);
+            while(!processQ.isEmpty()) {
+                int[] poll = processQ.poll();
+                waitQ.add(poll);
+                // System.out.printf("waitQ 다시 add %d %d %d\n", poll[0], poll[1], poll[2]);
             }
+            
+            curTime++;
         }
-        return timeSum / jobs.length;
+        
+        int answer = 0;
+        for (Integer i : result) {
+            answer += i;
+        }
+        return answer / result.size();
     }
 }
