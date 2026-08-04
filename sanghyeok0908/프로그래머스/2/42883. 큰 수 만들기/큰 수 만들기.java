@@ -3,25 +3,29 @@ import java.util.*;
 class Solution {
 
     public String solution(String number, int k) {
-        int n = number.length();
-        Stack<Integer> stack = new Stack<>();
-        int curK = k;
+        int cnt = 0;
+        Deque<Integer> queue = new ArrayDeque<>();
+        char[] arr = number.toCharArray();
+        queue.add(arr[0] - '0');
         
-        for (int i = 0; i < n; i++) {
-            int num = Integer.parseInt(number.substring(i, i + 1));
-            
-            while (curK > 0 && !stack.isEmpty() && stack.peek() < num) {
-                curK--;
-                stack.pop();   
+        for (int i = 1; i < arr.length; i++) {
+            while (!queue.isEmpty() && cnt < k && queue.peekLast() < arr[i] - '0') {
+                queue.pollLast();
+                cnt++;
             }
-            stack.push(num);
+            queue.addLast(arr[i] - '0');
         }
         
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < n - k; i++) {
-            sb.append(stack.get(i));
+        while(cnt < k) {
+            queue.pollLast();
+            cnt++;
         }
         
-        return sb.toString();
+        String answer = "";
+        while(!queue.isEmpty()) {
+            Integer poll = queue.pollFirst();
+            answer += poll;
+        }
+        return answer;
     }
 }
