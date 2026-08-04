@@ -3,14 +3,9 @@ import java.util.*;
 class Solution {
     public int solution(int[][] routes) {
         
-        for (int[] row : routes){
-            Arrays.sort(routes, (o1,o2)->{
-                if (o1[1] != o2[1]){
-                    return Integer.compare(o1[1],o2[1]);
-                }
-                 return Integer.compare(o1[0],o2[0]);
-            });
-        }
+        Arrays.sort(routes, (o1,o2)->{
+            return Integer.compare(o1[1],o2[1]);
+        });
         
         int cnt = 0;
         int camera = Integer.MIN_VALUE;
