@@ -7,7 +7,7 @@ class Solution {
 
     static int[][] board;
     static int[][][] costs;
-    static Queue<Node> queue;
+    static PriorityQueue<Node> queue;
     static int n;
 
     static class Node {
@@ -33,7 +33,9 @@ class Solution {
         }
 
         costs = new int[n][n][4];
-        queue = new ArrayDeque<>();
+        queue = new PriorityQueue<>((o1,o2)->{
+            return Integer.compare(o1.cost, o2.cost);
+        });
 
         for (int x = 0; x < n; x++) {
             for (int y = 0; y < n; y++) {
