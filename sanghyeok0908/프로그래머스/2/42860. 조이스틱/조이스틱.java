@@ -13,19 +13,11 @@ class Solution {
             value = 26 - value < value ? 26 - value : value;
             answer += value;
             
-            // if (value == 0) {
-            //     continue;
-            // }
-            
             // side
             int next = i + 1;
             while(next < n && name.charAt(next) == 'A') {
                 next++;
             }
-            
-            // if (next >= n) {
-            //     break;
-            // }
             
             // 오른쪽 갔다가 왼쪽
             int rightAndLeft = i * 2 + n - next;
@@ -34,7 +26,6 @@ class Solution {
             int leftAndRight = (n - next) * 2 + i;
             
             min = Math.min(min,  Math.min(rightAndLeft, leftAndRight));
-            
         }
         return answer + min;
     }
