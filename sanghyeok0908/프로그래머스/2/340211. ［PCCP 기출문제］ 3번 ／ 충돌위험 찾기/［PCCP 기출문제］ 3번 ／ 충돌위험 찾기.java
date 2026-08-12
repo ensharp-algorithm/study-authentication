@@ -1,55 +1,52 @@
 import java.util.*;
 
 class Solution {
-    public int solution(int[][] points, int[][] routes) {
-        List<int[]>[] paths = new ArrayList[routes.length];
-        
-        for (int robot = 0; robot < routes.length; robot++) {
-            List<int[]> path = new ArrayList<>();
-            int[] route = routes[robot];
-            int curY = points[route[0] - 1][0] - 1;
-            int curX = points[route[0] - 1][1] - 1;
-            int time = 0;
 
-            path.add(new int[] { curY, curX, time++ });
+    public int solution(int[][] points, int[][] routes) {
+        Map<String, Integer> paths = new HashMap<>();
+        
+        for (int[] route : routes) {
+            int time = 0;
+            int[] cur = points[route[0] - 1].clone();
+            
+            String key = convertToKey(time, cur);
+            paths.put(key, paths.getOrDefault(key, 0) + 1);
             
             for (int i = 1; i < route.length; i++) {
-                int endY = points[route[i] - 1][0] - 1;
-                int endX = points[route[i] - 1][1] - 1;
+                int[] end = points[route[i] - 1];
+                // System.out.printf("도착지 = %d, %d\n", end[0], end[1]);
+                // System.out.println(key + " => " + paths.get(key));
                 
-                while(curY != endY) {
-                    curY = curY + (endY > curY ? 1 : -1);
-                    path.add(new int[] { curY, curX, time++ });
+                while(cur[0] != end[0]) {
+                    time++;
+                    cur[0] = cur[0] < end[0] ? cur[0] + 1 : cur[0] - 1;
+
+                    key = convertToKey(time, cur);
+                    paths.put(key, paths.getOrDefault(key, 0) + 1);
+                    // System.out.println(key + " => " + paths.get(key));
                 }
-                
-                while(curX != endX) {
-                    curX = curX + (endX > curX ? 1 : -1);
-                    path.add(new int[] { curY, curX, time++ });
-                }
-            }
-            paths[robot] = path;
-        }
-        
-        Map<String, Integer> map = new HashMap<>();
-        for (int i = 0; i < routes.length; i++) {
-            // System.out.println("robot = " + i);
-            for (int[] p : paths[i]) {
-                // System.out.printf("%d %d %d\n", p[0], p[1], p[2]);
-                String key = p[0] + ", " + p[1] + ": " + p[2];
-                map.put(key, map.getOrDefault(key, 0) + 1);
+
+                while(cur[1] != end[1]) {
+                    time++;
+                    cur[1] = cur[1] < end[1] ? cur[1] + 1 : cur[1] - 1;
+
+                    key = convertToKey(time, cur);
+                    paths.put(key, paths.getOrDefault(key, 0) + 1);
+                    // System.out.println(key + " => " + paths.get(key));
+                }       
             }
         }
         
         int answer = 0;
-        for (Integer i : map.values()) {
-            if (i >= 2) {
+        for (String k : paths.keySet()) {
+            if (paths.get(k) > 1) {
                 answer++;
             }
         }
-        
-        // for (String key : map.keySet()) {
-        //     System.out.println("key = " + key + " value = " + map.get(key));
-        // }
         return answer;
+    }
+    
+    String convertToKey(int time, int[] pos) {
+        return time + ":" + pos[0] + "," + pos[1];
     }
 }
