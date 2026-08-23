@@ -2,59 +2,55 @@ import java.util.*;
 
 class Solution {
     
-    int[][] tree;
-    int maxShape = 0;
+    List<Integer>[] tree;
+    int maxSheep = 0;
     
     public int solution(int[] info, int[][] edges) {
-        tree = new int[info.length][3]; // {info, left, right}
+        tree = new ArrayList[info.length];
         
         for (int i = 0; i < info.length; i++) {
-            tree[i][0] = info[i];
+            tree[i] = new ArrayList<>();
         }
         
         for (int i = 0; i < edges.length; i++) {
-            if (tree[edges[i][0]][1] == 0) {
-                tree[edges[i][0]][1] = edges[i][1];
-            } else {
-                tree[edges[i][0]][2] = edges[i][1];
-            }
+            tree[edges[i][0]].add(edges[i][1]);
         }
         
-        TreeSet<Integer> queue = new TreeSet<>();
-        queue.add(0);
-        
-        recursion(0, 0, 0, queue);
-        
-        return maxShape;
+        List<Integer> next = new ArrayList<>();
+        next.add(0);
+        recursion(info, 0, 0, 0, next);
+        return maxSheep;
     }
     
-    void recursion(int cur, int shape, int wolf, TreeSet<Integer> set) {
-        if (tree[cur][0] == 0) {
-            shape++;
+    void recursion(int[] info, int cur, int sheep, int wolf, List<Integer> next) {
+        if (info[cur] == 0) {
+            sheep++;
         } else {
             wolf++;
         }
         
-        // System.out.printf("cur = %d, shape = %d, wolf = %d\n", cur, shape, wolf);
-        
-        if (shape <= wolf) {
+        if (wolf >= sheep) {
             return;
         }
         
-        maxShape = Math.max(maxShape, shape);
+        maxSheep = Math.max(maxSheep, sheep);
         
-        TreeSet<Integer> newSet = new TreeSet<>(set);
-        newSet.remove(cur);
+        List<Integer> newNext = new ArrayList<>(next);
+        newNext.remove(Integer.valueOf(cur));
         
-        if (tree[cur][1] != 0) {
-            newSet.add(tree[cur][1]);
-        }
-        if (tree[cur][2] != 0) {
-            newSet.add(tree[cur][2]);
+        if (tree[cur] != null) {
+            newNext.addAll(tree[cur]);
         }
         
-        for (Integer i : newSet) {
-            recursion(i, shape, wolf, newSet);
+        // System.out.printf("cur = %d, sheep = %d, wolf = %d\n", cur, sheep, wolf);
+        // System.out.println("child node = ");
+        // for (Integer i : newNext) {
+        //     System.out.print(i + " ");
+        // }
+        // System.out.println();
+        
+        for (Integer child : newNext) {
+            recursion(info, child, sheep, wolf, newNext);
         }
     }
 }
