@@ -2,67 +2,27 @@ import java.util.*;
 
 class Solution {
     
+    Queue<Integer> queue = new PriorityQueue<>(Collections.reverseOrder());
+    
     public long solution(int n, int[] works) {
-        int left = 0, right = 0, maxMid = 0;
-        long total = 0;
-        
         for (int w : works) {
-            right = Math.max(right, w);
-            maxMid = Math.max(maxMid, w);
-            total += w;
-        }
-        if (total <= n) {
-            return 0;
+            queue.add(w);
         }
         
-        while(left <= right) {
-            int mid = (left + right) / 2;
-            int diff = 0;
-            
-            for (int w : works) {
-                if (w > mid) {
-                    diff += w - mid;
-                }
-            }
-            
-            if (diff <= n) {
-                maxMid = Math.min(maxMid, mid);
-                right = mid - 1;
-            } else {
-                left = mid + 1;
-            }
+        while(!queue.isEmpty() && n > 0) {
+            Integer max = queue.poll();
+            max--;
+            n--;
+            if (max > 0)
+                queue.add(max);
         }
-        
-        // System.out.println("maxMid = " + maxMid);
-        
-        int copyN = n;
-        for (int i = 0; i < works.length; i++) {
-            if (maxMid < works[i]) {
-                copyN -= (works[i] - maxMid);
-                works[i] = maxMid;
-            }
-        }
-        
-        // int idx = 0;
-        // while(copyN > 0) {
-        //     works[idx]--;
-        //     copyN--;
-        //     idx = (idx + 1) % works.length;
-        // }
         
         long answer = 0;
-        for (int i = 0; i < works.length; i++) {
-            if (copyN > 0 && works[i] == maxMid) {
-                works[i]--;
-                copyN--;
-            }
-            answer += (long) works[i] * works[i];
+        while(!queue.isEmpty()) {
+            int poll = queue.poll();
+            answer += Math.pow(poll, 2);
+            // System.out.println(poll[0] + " " + poll[1]);
         }
-        
-        // long answer = 0;
-        // for (int w : works) {
-        //     answer += Math.pow(w, 2);
-        // }
         return answer;
     }
 }
