@@ -5,49 +5,50 @@ class Solution {
     int[] parent, rank;
     
     public int solution(int n, int[][] computers) {
-        parent = new int[n];
-        rank = new int[n];
-        for (int i = 0; i < n; i++) {
+        parent = new int[n + 1];
+        rank = new int[n + 1];
+        for (int i = 1; i <= n; i++) {
             parent[i] = i;
         }
         
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
+        for (int i = 0; i < n - 1; i++) {
+            for (int j = i + 1; j < n; j++) {
                 if (i != j && computers[i][j] == 1) {
-                    union(i, j);
+                    union(i + 1, j + 1);
                 }
             }
         }
         
         Set<Integer> set = new HashSet<>();
-        for (int i = 0; i < n; i++) {
+        for (int i = 1; i <= n; i++) {
             set.add(find(i));
         }
         return set.size();
     }
     
-    int find(int a) {
-        if (parent[a] == a) {
-            return a;
+    int find(int x) {
+        if (parent[x] == x) {
+            return x;
         }
-        return parent[a] = find(parent[a]);
+        return parent[x] = find(parent[x]);
     }
     
-    void union(int a, int b) {
-        int rootA = find(a);
-        int rootB = find(b);
+    boolean union(int x, int y) {
+        int rootX = find(x);
+        int rootY = find(y);
         
-        if (rootA == rootB) {
-            return;
+        if (rootX == rootY) {
+            return false;
         }
         
-        if (rank[rootA] < rank[rootB]) {
-            parent[rootA] = rootB;
-        } else if (rank[rootA] > rank[rootB]) {
-            parent[rootB] = rootA;
+        if (rank[rootX] < rank[rootY]) {
+            parent[rootX] = rootY;
+        } else if (rank[rootX] > rank[rootY]) {
+            parent[rootY] = rootX;
         } else {
-            parent[rootB] = rootA;
-            rank[rootA]++;
+            parent[rootX] = rootY;
+            rank[rootY]++;
         }
+        return true;
     }
 }
