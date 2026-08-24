@@ -2,53 +2,43 @@ import java.util.*;
 
 class Solution {
     
-    class Node {
-        String str;
-        int depth;
-        
-        Node(String str, int depth) {
-            this.str = str;
-            this.depth = depth;
-        }
-    }
-    
-    int wordLen;
+    int n;
+    int answer = Integer.MAX_VALUE;
+    boolean[] visited;
     
     public int solution(String begin, String target, String[] words) {
-        int n = words.length;
-        Queue<Node> queue = new ArrayDeque<>();
-        boolean[] visited = new boolean[n];
-        wordLen = begin.length();
-        
-        queue.add(new Node(begin, 0));
-        
-        while(!queue.isEmpty()) {
-            Node poll = queue.poll();
-            
-            if (poll.str.equals(target)) {
-                return poll.depth;
-            }
-            
-            for (int i = 0; i < n; i++) {
-                if (!visited[i] && possible(poll.str, words[i])) {
-                    visited[i] = true;
-                    queue.add(new Node(words[i], poll.depth + 1));
-                }
-            }
-        }
-        return 0;
+        n = words.length;
+        visited = new boolean[n];
+        dfs(begin, target, words, 0);
+        return answer == Integer.MAX_VALUE ? 0 : answer;
     }
     
-    boolean possible(String str1, String str2) {
-        char[] arr1 = str1.toCharArray();
-        char[] arr2 = str2.toCharArray();
-        int cnt = 0;
-        
-        for (int i = 0; i < wordLen; i++) {
-            if (arr1[i] == arr2[i]) {
-                cnt++;
-            }    
+    void dfs(String begin, String target, String[] words, int depth) {
+        if (depth == n) {
+            return;
         }
-        return cnt == wordLen - 1;
+        if (begin.equals(target)) {
+            answer = Math.min(answer, depth);
+        }
+        
+        for (int i = 0; i < n; i++) {
+            if (visited[i] || !isPossible(begin, words[i])) {
+                continue;
+            }
+            
+            visited[i] = true;
+            dfs(words[i], target, words, depth + 1);
+            visited[i] = false;
+        }
+    }
+    
+    boolean isPossible(String begin, String target) {
+        int cnt = 0;
+        for (int i = 0; i < begin.length(); i++) {
+            if (begin.charAt(i) != target.charAt(i)) {
+                cnt++;
+            }
+        }
+        return cnt == 1;
     }
 }
