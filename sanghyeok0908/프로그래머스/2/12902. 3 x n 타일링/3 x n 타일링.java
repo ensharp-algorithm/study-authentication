@@ -1,6 +1,6 @@
 class Solution {
     public int solution(int n) {
-        if (n == 0 || n % 2 != 0)
+        if (n % 2 != 0)
             return 0;
         
         int[] even = new int[n + 1], odd = new int[n + 1];
