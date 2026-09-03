@@ -1,45 +1,64 @@
 import java.util.*;
 
 class Solution {
+    
+    static HashSet<Integer>[] graph;
+    static HashSet<Integer>[] win;
+    static HashSet<Integer>[] lose;
 
     public int solution(int n, int[][] results) {
-    
-        boolean [][] win = new boolean[n+1][n+1];
         
-        for (int[] row : results){
-          win[row[0]][row[1]] = true;
+        graph = new HashSet[n+1];
+        win = new HashSet[n+1];
+        lose = new HashSet[n+1];
+        
+        for (int i = 1; i <= n; i++){
+            graph[i] = new HashSet<>();
+            win[i] = new HashSet<>();
+            lose[i] = new HashSet<>();
         }
         
-        //k를 거쳐서 이기는 경우 갱신
-        for (int k= 1; k<=n;k++){
-            for (int i = 1; i <=n;i++){
-                for (int j = 1; j <=n;j++){
-                    if (win[i][k] && win[k][j]){
-                        // System.out.println("win " + i + " " + k  + " win " + k + " " + j);
-                        win[i][j] = true;
-                    }
-                }
+        for (int[] result : results) {
+            int winner = result[0];
+            int loser = result[1];
+            
+            graph[winner].add(loser);
+        }
+        
+        for (int i = 1; i <= n; i++) {
+
+            boolean[] visited = new boolean[n+1];
+            visited[i] = true;
+            dfs(i, i, visited);
+        }
+        
+        
+        int answer = 0;
+        
+        for (int i = 1; i <= n; i++){
+            
+            if (win[i].size() + lose[i].size() == n-1){
+                answer++;
             }
         }
         
-        int [] answer = new int[n+1];
-        Arrays.fill(answer,0);
-        
-        for (int i = 1; i <=n;i++){
-            for (int j = 1; j <=n;j++){
-                if (win[i][j] || win[j][i]){
-                    answer[i]++;
-                }
+        return answer;  
+    }
+
+    private void dfs(int root, int current, boolean[] visited) {
+
+        for (Integer next : graph[current]) {
+
+            if (visited[next]) {
+                continue;
             }
+
+            visited[next] = true;
+
+            win[root].add(next);
+            lose[next].add(root);
+
+            dfs(root, next, visited);
         }
-        
-        int cnt = 0;
-        for (int i = 1; i <=n;i++){
-            if (answer[i] == n-1){
-                cnt++;
-            }
-        }
-        
-        return cnt;  
     }
 }
