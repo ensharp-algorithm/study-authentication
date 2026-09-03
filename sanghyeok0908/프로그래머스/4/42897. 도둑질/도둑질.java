@@ -1,18 +1,25 @@
 class Solution {
-    
+
     public int solution(int[] money) {
         int n = money.length;
-        int[][] dp = new int[2][money.length];
         
-        dp[0][0] = money[0];
-        dp[0][1] = money[0];
-        dp[1][0] = 0;
-        dp[1][1] = money[1];
-        
-        for (int i = 2; i < n; i++) {
-            dp[0][i] = Math.max(money[i] + dp[0][i - 2], dp[0][i - 1]);
-            dp[1][i] = Math.max(money[i] + dp[1][i - 2], dp[1][i - 1]);
+        // 첫 번째 집을 안 털었을 때
+        int[][] dp = new int[n][2];
+        for (int i = 1; i < n; i++) {
+            dp[i][0] = Math.max(dp[i - 1][0], dp[i - 1][1]);
+            dp[i][1] = dp[i - 1][0] + money[i];
         }
-        return Math.max(dp[0][n - 2], dp[1][n - 1]);
+        
+        int temp = Math.max(dp[n - 1][0], dp[n - 1][1]);
+        
+        // 첫 번째 집을 털었을 때
+        dp = new int[n][2];
+        dp[0][1] = money[0];
+        for (int i = 1; i < n - 1; i++) {
+            dp[i][0] = Math.max(dp[i - 1][0], dp[i - 1][1]);
+            dp[i][1] = dp[i - 1][0] + money[i];
+        }
+        
+        return Math.max(temp, Math.max(dp[n - 2][0], dp[n - 2][1]));
     }
 }
