@@ -7,6 +7,7 @@ class Solution {
         for (int i = 1; i <= n; i++) {
             for (int j = 0; j < i; j++) {
                 dp[i] += dp[j] * dp[i - 1 - j];
+                // System.out.printf("i=%d,j=%d, dp[i]=%d, dp[j]=%d,dp[i-1-j]=%d, i-1-j=%d\n", i, j, dp[i], dp[j], dp[i - 1 - j], i-1-j);
             }
         }
         
