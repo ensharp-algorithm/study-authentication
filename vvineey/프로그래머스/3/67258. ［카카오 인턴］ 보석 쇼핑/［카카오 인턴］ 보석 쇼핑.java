@@ -2,62 +2,62 @@ import java.util.*;
 
 class Solution {
     
+    HashMap<String, Integer> bag;
+    HashSet<String> set;
+    int n;
+    int[] answer;
+    
     public int[] solution(String[] gems) {
         
-        HashSet<String> gemSet = new HashSet<>();
-        HashMap<String, Integer> shopping = new HashMap<>();
-        int minLength = Integer.MAX_VALUE;
+        bag = new HashMap<>();
+        set = new HashSet<>();
+        answer = new int[] {0, gems.length - 1};
         
-        //
-        for (String s : gems){
-            gemSet.add(s);
+        for (String gem : gems){
+            set.add(gem);
         }
-        //
         
+        n = set.size();
+        shop(gems);
+    
+        // 문제에서는 1번부터 시작
+        return new int[] {answer[0] + 1, answer[1] + 1};
+    }
+    
+    private void shop(String[] gems){
         
-        int left = 0;
+        int left = 0; 
         int right = 0;
         
-        int bestLeft = left;
-        int bestRight = right;
-        
-        while(right < gems.length){
+        while (right < gems.length){
             
-//             System.out.println(left + " " + right);
-//             System.out.println(shopping);
-         
-            shopping.put(gems[right], shopping.getOrDefault(gems[right],0) +1);
-            right++;
+            // right 보석 추가
+            bag.put(gems[right], bag.getOrDefault(gems[right], 0) + 1);
             
-            //모든 보석을 다 담았고 left를 빼도 만족하면 길이를 갱신
-            while (shopping.size() == gemSet.size()){
+            // System.out.println(left + " " + right + " " + bag);
+            
+            // 모든 종류의 보석을 담았다면
+            while (bag.size() == n){
                 
-//                 System.out.println(left + " " + right);
-//                 System.out.println(shopping);
-            
-                shopping.replace(gems[left],shopping.get(gems[left])-1);
+                // System.out.println(" > " + left + " " + right);
                 
-                if (shopping.get(gems[left]) == 0 ){
-                    shopping.remove(gems[left]);
+                // 갱신
+                if (answer[1] - answer[0] > right - left) {
+                    answer = new int[] {left, right};
                 }
                 
-                left ++;
+                // left 보석 제거
+                bag.put(gems[left], bag.get(gems[left]) - 1);
                 
-                if (right - left + 1 < minLength){
-                    minLength = Math.min(minLength, right - left +1);
-                    // System.out.println("minLength "  + minLength + " current length " + (right - left +1));
-
-                    bestLeft = left;
-                    bestRight = right;
+                // 완전히 없 -> Map에서도 제거
+                if (bag.get(gems[left]) == 0){
+                    bag.remove(gems[left]);
                 }
+                
+                left++;
             }
             
-    
-            
+            right++;
         }
-        
-        int[] answer = new int[]{bestLeft,bestRight};
-        
-        return answer;
     }
 }
