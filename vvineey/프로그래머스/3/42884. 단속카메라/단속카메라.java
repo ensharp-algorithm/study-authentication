@@ -3,32 +3,29 @@ import java.util.*;
 class Solution {
     public int solution(int[][] routes) {
         
-        Arrays.sort(routes, (o1,o2)->{
-            return Integer.compare(o1[1],o2[1]);
-        });
+        for (int [] route : routes){
+            Arrays.sort(routes, (o1,o2)->{
+                return Integer.compare(o1[1], o2[1]);
+            });
+        }
         
+        int prev = Integer.MIN_VALUE;
         int cnt = 0;
-        int camera = Integer.MIN_VALUE;
         
-        for (int [] row: routes){
+        for (int i = 0; i < routes.length; i++) {
             
-            // System.out.println("camera " + camera);
+            // System.out.println(routes[i][0] + " " + routes[i][1]);
             
-            int in = row[0];
-            int out = row[1];
-             
-            if (in > camera){
-                camera = out;
+            // System.out.println(prev + " vs " + routes[i][0]);
+            if (prev < routes[i][0]){
+                
+                
+                prev = routes[i][1];
+                // System.out.println("> 설치 : " + prev);
                 cnt++;
             }
+      
         }
-    
-        
-        // [0] -20 -19 -18 -17 -16 -15  
-        // [2]         -18 -17 -16 -15  -14 -13
-        // [1]                          -14 -13 -12 ... -5
-        // [3]                                          -5  -4 -3 
-        
         
         return cnt;
     }
