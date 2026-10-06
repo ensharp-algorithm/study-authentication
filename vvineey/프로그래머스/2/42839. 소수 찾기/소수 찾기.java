@@ -1,78 +1,56 @@
 import java.util.*;
 
 class Solution {
+    static String[] arr;
+    static boolean[] visited;
+    static HashSet<Integer> hs;
     
-    int n;
-    boolean [] visited;
-    String str;
-    HashSet<Integer> hs;
- 
-    private boolean isPrimeNum(String num){
+    public int solution(String numbers) {
         
-        if (Integer.parseInt(num) < 2){
-            return false;
-        }
+        arr = numbers.split("");
+        visited = new boolean[arr.length];
+        hs = new HashSet<>();
+        
+        System.out.println(Arrays.toString(arr));
+        makePrimeNum("");
+        
     
-        for (int i = 2; i * i <= Integer.parseInt(num) ; i++){
-            if (Integer.parseInt(num) % i == 0){
-                return false;
-            }
-        }
-        
-        System.out.println("true !! " + Integer.parseInt(num));
-        return true;
+        return hs.size();
     }
     
-       
-    private void dfs(String num){
+    private void makePrimeNum(String str){
         
-    
-        if (!num.isEmpty()){
-            if (isPrimeNum(num)){
-                hs.add(Integer.parseInt(num));
-            }
+        if (str.length() > 0 && isPrime(Integer.parseInt(str))){
+            hs.add(Integer.parseInt(str));
         }
         
-    
-        for (int i = 0; i < n; i++){
+        if (str.length() == arr.length){
+            return;
+        }
+        
+        for(int i = 0; i < arr.length; i++){
             
-             if (visited[i]) {
+            if(visited[i]){
                 continue;
             }
-
             visited[i] = true;
-            
-            dfs(num + str.charAt(i));
-            
+            makePrimeNum(str + arr[i]);
             visited[i] = false;
         }
     }
     
-    
-    
-    public int solution(String numbers) {
+    private boolean isPrime(int num) {
         
-        n = numbers.length();
-        str = numbers;
-        visited = new boolean[n+1];
-        hs = new HashSet<>();
+        if(num < 2){
+            return false;
+        }
         
-        String num = "";
+        for(int i = 2; i <= Math.sqrt(num); i++){
+            if (num % i ==0){
+                return false;
+            }
+        }
         
-        dfs(num);
-        
-        //1 2 3
-        // 1
-        // 1 2
-        // 1 2 3
-        // 1 3 
-        // 1 3 2
-        
-        // 2 
-        // 2 1
-        // 2 1 3
-        // ..
-   
-        return hs.size();
+        return true;
     }
 }
