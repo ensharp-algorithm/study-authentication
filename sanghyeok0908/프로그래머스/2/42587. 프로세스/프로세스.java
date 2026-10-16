@@ -6,29 +6,31 @@ class Solution {
         Queue<int[]> queue = new ArrayDeque<>();
         
         for (int i = 0; i < priorities.length; i++) {
-            queue.add(new int[] {i, priorities[i]});
+            queue.add(new int[] { i, priorities[i] });
         }
         
         int cnt = 0;
+        
         while(!queue.isEmpty()) {
-            int[] cur = queue.poll();
-            boolean isFirst = true;
+            boolean isProcess = true;
+            int[] poll = queue.poll();
             
-            for (int[] q : queue) {
-                if (cur[1] < q[1]) {
-                    isFirst = false;        
+            for (int[] process : queue) {
+                if (poll[1] < process[1]) {
+                    isProcess = false;
                     break;
                 }
             }
             
-            if (isFirst) {
-                cnt++;
-                
-                if (cur[0] == location) {
-                    return cnt;
-                }
-            } else {
-                queue.add(cur);
+            if (!isProcess) {
+                queue.add(poll);
+                continue;
+            }
+            
+            cnt++;
+            
+            if (poll[0] == location) {
+                return cnt;
             }
         }
         return -1;
