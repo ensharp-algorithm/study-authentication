@@ -2,74 +2,65 @@ import java.util.*;
 
 class Solution {
     
-    int[] dy = new int[] { -1, 0, 1, 0 };
-    int[] dx = new int[] { 0, 1, 0, -1 };
+    int[] dy = { -1, 1, 0, 0 };
+    int[] dx = { 0, 0, -1, 1 };
     int n, m;
-    int[] volumes;
     
     public int solution(int[][] land) {
-        int answer = 0;
         n = land.length;
         m = land[0].length;
-        volumes = new int[n * m + 10];
-        int lastIdx = initLand(land);
+        int[] dp = new int[n * m + 10];
         
-        for (int j = 0; j < m; j++) {
-            int temp = 0;
-            boolean[] visited = new boolean[lastIdx + 1];
-            // System.out.println("row = " + j);
-            
-            for (int i = 0; i < n; i++) {
-                if (land[i][j] != 0 && !visited[land[i][j]]) {
-                    visited[land[i][j]] = true;
-                    temp += volumes[land[i][j]];
-                    // System.out.printf("idx = %d, volume = %d\n", 
-                    //                   land[i][j], volumes[land[i][j]]);
-                }
-            }
-            answer = Math.max(answer, temp);
-        }
-        return answer;
-    }
-    
-    int initLand(int[][] land) {
-        int idx = 2;
-        
-        for (int i = 0; i < n; i++) {
+        for (int i = 0, idx = 2; i < n; i++) {
             for (int j = 0; j < m; j++) {
                 if (land[i][j] == 1) {
-                    int cnt = bfs(land, i, j, idx);
-                    volumes[idx++] = cnt;
+                    dp[idx] = bfs(land, i, j, idx);
+                    idx++;
                 }
             }
         }
-        return idx - 1;
+        
+        int max = 0;
+        
+        for (int i = 0; i < m; i++) {
+            Set<Integer> set = new HashSet<>();
+            int sum = 0;
+            
+            for (int j = 0; j < n; j++) {
+                if (set.add(land[j][i])) {
+                    sum += dp[land[j][i]];
+                }
+            }
+            
+            max = Math.max(max, sum);
+        }
+        return max;
     }
     
-    int bfs(int[][] land, int y, int x, int idx) {
+    int bfs(int[][] land, int startY, int startX, int idx) {
         int cnt = 1;
         Queue<int[]> queue = new ArrayDeque<>();
-        queue.add(new int[] { y, x });
-        land[y][x] = idx;
+        
+        queue.add(new int[] { startY, startX });
+        land[startY][startX] = idx;
         
         while(!queue.isEmpty()) {
             int[] poll = queue.poll();
             
             for (int i = 0; i < 4; i++) {
-                int curY = poll[0] + dy[i];
-                int curX = poll[1] + dx[i];
+                int y = poll[0] + dy[i];
+                int x = poll[1] + dx[i];
                 
-                if (curY < 0 || curY >= n || curX < 0 || curX >= m || 
-                    land[curY][curX] != 1) {
+                if (y < 0 || y >= n || x < 0 || x >= m
+                   || land[y][x] != 1) {
                     continue;
                 }
                 
-                queue.add(new int[] { curY, curX });
-                land[curY][curX] = idx;
+                land[y][x] = idx;
                 cnt++;
+                queue.add(new int[] { y, x });
             }
         }
-        
         return cnt;
     }
 }
