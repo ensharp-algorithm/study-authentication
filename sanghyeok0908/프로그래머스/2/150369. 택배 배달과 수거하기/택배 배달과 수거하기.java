@@ -1,54 +1,51 @@
 import java.util.*;
 
 class Solution {
+    
     public long solution(int cap, int n, int[] deliveries, int[] pickups) {
+        int deliveryIdx = getInitValue(n, deliveries);
+        int pickupIdx = getInitValue(n, pickups);
         long answer = 0;
-        Stack<int[]> dStack = new Stack<>();
-        Stack<int[]> pStack = new Stack<>();
         
-        for (int i = 0; i < n; i++) {
-            if (deliveries[i] != 0) {
-                dStack.add(new int[] {i, deliveries[i]});
-            }
+        while(deliveryIdx >= 0 || pickupIdx >= 0) {
+            answer += (Math.max(deliveryIdx, pickupIdx) + 1) * 2;
             
-            if (pickups[i] != 0) {
-                pStack.add(new int[] {i, pickups[i]});
-            }
-        }
-        
-        while(!dStack.isEmpty() && !pStack.isEmpty()) {
-            int result = dStack.peek()[0] > pStack.peek()[0] ? dStack.peek()[0] + 1 : pStack.peek()[0] + 1;
-            answer += result * 2;
-            
-            calculate(dStack, cap, 0);
-            calculate(pStack, cap, 0);
-        }
-        
-        while(!dStack.isEmpty()) {
-            int result = dStack.peek()[0] + 1;
-            answer += result * 2;
-            calculate(dStack, cap, 0);
-        }
-        
-        while(!pStack.isEmpty()) {
-            int result = pStack.peek()[0] + 1;
-            answer += result * 2;
-            calculate(pStack, cap, 0);
+            if (deliveryIdx >= 0)
+                deliveryIdx = delivery(cap, n, deliveries, deliveryIdx);
+            if (pickupIdx >= 0)
+                pickupIdx = delivery(cap, n, pickups, pickupIdx);
         }
         return answer;
     }
     
-    void calculate(Stack<int[]> stack, int cap, int cur) {
-        if (stack.isEmpty()) {
-            return;
-        }
+    int getInitValue(int n, int[] deliveries) {
+        int idx = n - 1;
         
-        int[] pop = stack.pop();
-        
-        if (cur + pop[1] < cap) {
-            calculate(stack, cap, cur + pop[1]);
-        } else if (cur + pop[1] > cap) {
-            stack.push(new int[] { pop[0], pop[1] - (cap - cur) });
+        while(idx >= 0 && deliveries[idx] == 0) {
+            idx--;
         }
+        return idx;
+    }
+        
+    int delivery(int cap, int n, int[] deliveries, int idx) {
+        int remaining = cap;
+
+        while(idx >= 0 && remaining > 0) {
+            if (deliveries[idx] == 0) {
+                idx--;
+                continue;
+            }
+
+            while(idx >= 0 && deliveries[idx] <= remaining) {
+                remaining -= deliveries[idx];
+                deliveries[idx--] = 0;
+            }
+            
+            if (idx >= 0 && deliveries[idx] > remaining) {
+                deliveries[idx] -= remaining;
+                remaining = 0;
+            }
+        }
+        return idx;
     }
 }
