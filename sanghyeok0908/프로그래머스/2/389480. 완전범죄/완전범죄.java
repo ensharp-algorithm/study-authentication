@@ -2,42 +2,32 @@ import java.util.*;
 
 class Solution {
     
+    int[][] dp;
+    
     public int solution(int[][] info, int n, int m) {
-        int[] dp = new int[m];
-        Arrays.fill(dp, Integer.MAX_VALUE);
-        dp[0] = 0;
+        dp = new int[info.length][m];
+        for (int i = 0; i < info.length; i++)
+            Arrays.fill(dp[i], -1);
         
-        for (int[] i : info) {
-            int a = i[0];
-            int b = i[1];
-            
-            int[] next = new int[m];
-            Arrays.fill(next, Integer.MAX_VALUE);
-            for (int j = 0; j < m; j++) {
-                if (dp[j] == Integer.MAX_VALUE) {
-                    continue;
-                }
-                
-                if (dp[j] + a < n) {
-                    next[j] = Math.min(next[j], dp[j] + a);
-                }
-                if (j + b < m) {
-                    next[j + b] = Math.min(next[j + b], dp[j]);
-                }
-            }
-            
-            System.out.println("i = " + a + " " + b);
-            for (int j = 0; j < m; j++) {
-                System.out.print(dp[j] + " ");
-            }
-            System.out.println();
-            dp = next;
+        int answer = dfs(info, m, 0, 0);
+        return answer >= n ? -1 : answer;
+    }
+    
+    int dfs(int[][] info, int m, int depth, int bSum) {
+        if (depth == info.length) {
+            return 0;
         }
         
-        int answer = Integer.MAX_VALUE;
-        for (int d : dp) {
-            answer = Math.min(answer, d);
+        if (dp[depth][bSum] != -1) {
+            return dp[depth][bSum];
         }
-        return answer == Integer.MAX_VALUE ? -1 : answer;
+        
+        int a = info[depth][0] + dfs(info, m, depth + 1, bSum);
+        int b = Integer.MAX_VALUE;
+        
+        if (bSum + info[depth][1] < m) {
+            b = dfs(info, m, depth + 1, bSum + info[depth][1]);
+        }
+        return dp[depth][bSum] = Math.min(a, b);
     }
 }
