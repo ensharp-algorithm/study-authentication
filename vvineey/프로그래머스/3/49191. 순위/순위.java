@@ -2,63 +2,49 @@ import java.util.*;
 
 class Solution {
     
-    static HashSet<Integer>[] graph;
-    static HashSet<Integer>[] win;
-    static HashSet<Integer>[] lose;
-
+    int[] player;
+    int n;
+    boolean[][] history;
+    
     public int solution(int n, int[][] results) {
         
-        graph = new HashSet[n+1];
-        win = new HashSet[n+1];
-        lose = new HashSet[n+1];
-        
-        for (int i = 1; i <= n; i++){
-            graph[i] = new HashSet<>();
-            win[i] = new HashSet<>();
-            lose[i] = new HashSet<>();
-        }
-        
+        player = new int[n+1];
+        history = new boolean[n+1][n+1];
+
         for (int[] result : results) {
-            int winner = result[0];
-            int loser = result[1];
-            
-            graph[winner].add(loser);
+            history[result[0]][result[1]] = true;         
         }
         
-        for (int i = 1; i <= n; i++) {
-
-            boolean[] visited = new boolean[n+1];
-            visited[i] = true;
-            dfs(i, i, visited);
+        Arrays.fill(player,0);
+        
+        
+        for (int k = 1; k <= n; k++){
+            for (int i = 1; i <= n; i++){
+                for (int j = 1; j <= n; j++){
+                    if (history[i][k] && history[k][j]){
+                        history[i][j] = true;
+                    }
+                }
+            }
         }
-        
-        
-        int answer = 0;
         
         for (int i = 1; i <= n; i++){
-            
-            if (win[i].size() + lose[i].size() == n-1){
-                answer++;
+            for (int j = 1; j <= n; j++){
+                
+                if (history[i][j]) {
+                    player[i] ++;
+                    player[j] ++;
+                }
             }
         }
         
-        return answer;  
-    }
-
-    private void dfs(int root, int current, boolean[] visited) {
-
-        for (Integer next : graph[current]) {
-
-            if (visited[next]) {
-                continue;
+        int cnt = 0;
+        for (int i = 1; i <= n; i++){
+            if (player[i] == n-1){
+                cnt++;
             }
-
-            visited[next] = true;
-
-            win[root].add(next);
-            lose[next].add(root);
-
-            dfs(root, next, visited);
         }
+        
+        return cnt;
     }
 }
