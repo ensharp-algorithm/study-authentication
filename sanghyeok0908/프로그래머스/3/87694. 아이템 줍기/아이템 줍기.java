@@ -2,101 +2,76 @@ import java.util.*;
 
 class Solution {
     
-    boolean[][] matrix = new boolean[110][110];
+    boolean[][] matrix = new boolean[101][101];
     
-    public int solution(int[][] rectangle, int characterX, int characterY, int itemX, int itemY) {
+    public int solution(int[][] rectangle, int characterX, int characterY, 
+                        int itemX, int itemY) {
         characterX *= 2;
         characterY *= 2;
         itemX *= 2;
         itemY *= 2;
-        
         for (int[] rect : rectangle) {
-            int leftX = rect[0] * 2;
-            int leftY = rect[1] * 2;
-            int rightX = rect[2] * 2;
-            int rightY = rect[3] * 2;
-            
-            int curX = leftX;
-            int curY = leftY;
-            
-            while(curX <= rightX) {
-                matrix[curY][curX++] = true;
+            for (int i = 0; i < 4; i++) {
+                rect[i] *= 2;
             }
-            curX--;
             
-            while(curY <= rightY) {
-                matrix[curY++][curX] = true;
-            }
-            curY--;
-            
-            // System.out.printf("%d %d\n", curY, curX);
-            while(curX >= leftX) {
-                matrix[curY][curX--] = true;
-            }
-            curX++;
-            
-            while(curY >= leftY) {
-                matrix[curY--][curX] = true;
-            }
-            curY++;
-            
-            // System.out.println("==========");
-            // for (int i = 0; i < 30; i++) {
-            //     for (int j = 0; j < 30; j++) {
-            //         System.out.print((matrix[i][j] ? 1 : 0) + " ");
-            //     }
-            //     System.out.println();
-            // }
+            drawLine(rect);
         }
         
         for (int[] rect : rectangle) {
-            int leftX = rect[0] * 2;
-            int leftY = rect[1] * 2;
-            int rightX = rect[2] * 2;
-            int rightY = rect[3] * 2;
-            
-            for (int i = leftY + 1; i < rightY; i++) {
-                for (int j = leftX + 1; j < rightX; j++) {
-                    matrix[i][j] = false;
-                }
-            }
+            eraseLine(rect);
         }
-
-        System.out.println("==========");
-        for (int i = 0; i < 30; i++) {
-            for (int j = 0; j < 30; j++) {
-                System.out.print((matrix[i][j] ? 1 : 0) + " ");
-            }
-            System.out.println();
-        }
-        
-        int[] dy = new int[] { -1, 1, 0, 0 };
-        int[] dx = new int[] { 0, 0, -1, 1 };
+        return bfs(characterY, characterX, itemY, itemX) / 2;
+    }
+    
+    int bfs(int startY, int startX, int endY, int endX) {
+        int[] dy = { -1, 1, 0, 0 };
+        int[] dx = { 0, 0, -1, 1 };
         Queue<int[]> queue = new ArrayDeque<>();
-        queue.add(new int[] { characterY, characterX, 0 });
-        matrix[characterY][characterX] = false;
+        
+        queue.add(new int[] { startY, startX, 0 });
+        matrix[startY][startX] = false;
         
         while(!queue.isEmpty()) {
             int[] poll = queue.poll();
             
-            if (poll[0] == itemY && poll[1] == itemX) {
-                return poll[2] / 2;
+            if (poll[0] == endY && poll[1] == endX) {
+                return poll[2];
             }
             
             for (int i = 0; i < 4; i++) {
-                int curY = poll[0] + dy[i];
-                int curX = poll[1] + dx[i];
+                int y = poll[0] + dy[i];
+                int x = poll[1] + dx[i];
                 
-                if (curY < 0 || curY >= 110 || curX < 0 || curX >= 110 
-                    || !matrix[curY][curX]) {
+                if (y < 0 || y >= 101 || x < 0 || x >= 101
+                   || !matrix[y][x]) {
                     continue;
                 }
                 
-                matrix[curY][curX] = false;
-                queue.add(new int[] { curY, curX, poll[2] + 1 });
+                matrix[y][x] = false;
+                queue.add(new int[] { y, x, poll[2] + 1 });
             }
         }
+        return -1;
+    }
+    
+    void eraseLine(int[] rect) {
+        for (int y = rect[1] + 1; y < rect[3]; y++) {
+            for (int x = rect[0] + 1; x < rect[2]; x++) {
+                matrix[y][x] = false;
+            }
+        }
+    }
+    
+    void drawLine(int[] rect) {
+        for (int y = rect[1]; y <= rect[3]; y++) {
+            matrix[y][rect[0]] = true;
+            matrix[y][rect[2]] = true;
+        }
         
-        return 0;
+        for (int x = rect[0]; x <= rect[2]; x++) {
+            matrix[rect[1]][x] = true;
+            matrix[rect[3]][x] = true;
+        }
     }
 }
