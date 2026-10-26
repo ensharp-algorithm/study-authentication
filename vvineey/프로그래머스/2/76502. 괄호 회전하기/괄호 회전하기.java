@@ -12,7 +12,7 @@ class Solution {
         }
         
         for(int i = 0; i < s.length(); i++){
-            
+        
             char c = stack.pollFirst();
             stack.offer(c);
             
@@ -37,19 +37,16 @@ class Solution {
         for (char c : stack ){
             if (hm.containsKey(c)){
                 queue.offer(c);
+                continue;
             }
-            else{
-                if (queue.isEmpty()){
-                    return false;
-                }
+            if (queue.isEmpty()){
+                return false;
+            }
                 
-                if(hm.get(queue.peekLast()) != c){
-                    return false;
-                }
-                else{
-                    queue.pollLast();
-                }
+            if(hm.get(queue.peekLast()) != c){
+                return false;
             }
+            queue.pollLast();
         }
         
         if (queue.size() != 0){
