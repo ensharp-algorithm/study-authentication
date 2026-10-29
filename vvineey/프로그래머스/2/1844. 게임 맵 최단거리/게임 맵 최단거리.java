@@ -1,89 +1,78 @@
 import java.util.*;
 
 class Solution {
-    
-    private class Node{
-        int row;
-        int col;
-        int total;
-        
-        Node(int row, int col, int total){
-            this.row = row;
-            this.col = col;
-            this.total = total;
-        }
-    }
-    
-        
-    //상 하 좌 우 기준 
-    int[] dy = {1,-1,0,0};
-    int[] dx = {0,0,-1,1};
-    
-    int [][] maps ;
-    int n, m;
-    boolean [][] visited;
-    Queue<Node> queue;
-
-    
+    static int[] dx = {0,0,-1,1};
+    static int[] dy = {1,-1,0,0};
     
     public int solution(int[][] maps) {
-     
-    
-        this.maps = maps;
-        n = maps.length;
-        m = maps[0].length;
-        
-        visited = new boolean[n][m];
-        
-        queue = new ArrayDeque<>();
-        
-        //시작 지점 처리
-        queue.offer(new Node(0,0,1));
-        visited[0][0] = true;
-        
-        return bfs();
+                
+        return bfs(maps, List.of(0,0));
     }
     
-    private int bfs(){
+    private int bfs(int[][] maps, List<Integer> start){
         
-        while (!queue.isEmpty()){
+        int n = maps.length;
+        int m = maps[0].length;
+        
+        boolean[][] visited = new boolean[n][m];
+        Queue<List<Integer>> queue = new ArrayDeque<>();
+        int[][][] parent = new int[n][m][2];
+    
+        visited[0][0] = true;
+        queue.offer(start);
+        
+        while(!queue.isEmpty()){
+            List<Integer> curr = queue.poll();
             
-            Node current = queue.poll();
-//             System.out.println("Now " + current.row + " " +current.col + " " + current.total);
-            
-            if (current.row == n-1 && current.col == m-1){
-                return current.total;
+            if (curr.get(0) == n-1 && curr.get(1) == m-1){
+                System.out.println("도착");
+                return getDistance(parent,n,m);
             }
             
-            //상하좌우 탐색 
-            for (int i = 0; i < 4;  i++){
+            for (int i = 0; i < 4; i++){
+                int nextY = curr.get(0) + dy[i];
+                int nextX = curr.get(1) + dx[i];
                 
-                Node nextNode = new Node((current.row + dx[i]) , (current.col + dy[i]), (current.total+1));
-                
-                if (nextNode.row < 0 || nextNode.row >= n){
+                if (nextX < 0 || nextY < 0 || nextY >= n || nextX >= m){
+                    continue;
+                }
+                if (visited[nextY][nextX] || maps[nextY][nextX] == 0){
                     continue;
                 }
                 
-                if (nextNode.col < 0 || nextNode.col >= m){
-                    continue;
-                }
+                parent[nextY][nextX][0] = curr.get(0);
+                parent[nextY][nextX][1] = curr.get(1);
                 
-                if (visited[nextNode.row][nextNode.col]){
-                    continue;
-                }
-                
-                
-                if (maps[nextNode.row][nextNode.col] == 0){
-                    continue;
-                }
-                
-             
-                visited[nextNode.row][nextNode.col] = true;
-                queue.offer(nextNode);
+                visited[nextY][nextX] = true;
+                queue.offer(List.of(nextY,nextX));
             }
-       }
+        }
         
         return -1;
+    }
+    
+    private int getDistance(int[][][] parent, int n, int m){
         
+        int y = n-1;
+        int x = m-1;
+        
+        int cnt = 0;
+        
+        while(true){
+            
+            // System.out.println(y + " " + x);
+            
+            if (x == 0 && y == 0){
+                break;
+            }
+            
+            
+            int prevY = parent[y][x][0];
+            int prevX = parent[y][x][1];
+            y = prevY;
+            x = prevX;
+            cnt++;
+        }
+        return (cnt+1);     
     }
 }
