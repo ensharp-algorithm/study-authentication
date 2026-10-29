@@ -2,59 +2,40 @@ import java.util.*;
 
 class Solution {
     
-    static class Node {
-        int v;
-        int distance;
-        
-        Node(int v, int distance) {
-            this.v = v;
-            this.distance = distance;
-        }
-    }
-    
-    static class Edge {
+    class Edge{
         int to;
         int cost;
         
-        Edge(int to, int cost) {
+        Edge(int to, int cost){
             this.to = to;
             this.cost = cost;
         }
     }
     
+    static int[] distance;
+    static int INF;
     static List<Edge>[] graph;
-    static int[] distances;
-    static int K;
-    static int N;
     
     public int solution(int N, int[][] road, int K) {
         
-        int answer = 0;
+        distance = new int[N+1];
+        INF = Integer.MAX_VALUE;
+        graph = new List[N+1];
         
-        graph = new ArrayList[N + 1];
-        distances = new int[N + 1];
-        this.K = K;
-        this.N = N;
-        
-        for (int i = 0; i <= N; i++) {
+        for (int i = 1; i < N+1 ; i++){
             graph[i] = new ArrayList<>();
         }
         
-        for (int i = 0; i < road.length; i++) {
-            int v1 = road[i][0];
-            int v2 = road[i][1];
-            int cost = road[i][2];
-            
-            graph[v1].add(new Edge(v2, cost));
-            graph[v2].add(new Edge(v1, cost));
+        for (int[] row : road){
+            graph[row[0]].add(new Edge(row[1],row[2]));
+            graph[row[1]].add(new Edge(row[0],row[2]));
         }
-        
-        //graph[0] :0에 연결된 간선들 [Edge0, Edge1 ...]
         
         dijkstra(1);
         
-        for (int i = 1; i <= N; i++) {
-            if (distances[i] <= K) {
+        int answer = 0;
+        for (int d : distance){
+            if (d <= K){
                 answer++;
             }
         }
@@ -62,46 +43,31 @@ class Solution {
         return answer;
     }
     
-    private void dijkstra(int start) {
+    private void dijkstra(int start){
+                
+        Arrays.fill(distance,INF);
+        distance[start] = 0;
         
-        Arrays.fill(distances, Integer.MAX_VALUE);
-        
-        PriorityQueue<Node> queue = new PriorityQueue<>((o1, o2) -> {
-            
-            if (o1.distance != o2.distance) {
-                return Integer.compare(o1.distance, o2.distance);
-            } 
-            
-            else {
-                return Integer.compare(o1.v, o2.v);
-            }
+        PriorityQueue<Edge> pq = new PriorityQueue<>((o1,o2)->{
+            return Integer.compare(o1.cost, o2.cost);
         });
         
-        queue.offer(new Node(start, 0));
-        distances[start] = 0;
+        pq.offer(new Edge(start,0));
         
-        while (!queue.isEmpty()) {
-            System.out.println(Arrays.toString(distances));
+        while(!pq.isEmpty()){
             
-            Node current = queue.poll();
+            Edge current = pq.poll();
             
-            if (current.distance > K) {
-                break;
-            }
-            
-            if (current.distance > distances[current.v]) {
+            if (distance[current.to] < current.cost) {
                 continue;
             }
-
-            for (Edge edge : graph[current.v]) {
-
-                int nextDistance = current.distance + edge.cost;
-
-                // 기존 거리보다 짧음 !!  발견
-                if (nextDistance < distances[edge.to]) {
-                    distances[edge.to] = nextDistance;
-
-                    queue.offer(new Node(edge.to, nextDistance));
+            
+            for (Edge next : graph[current.to]){
+                
+                if (current.cost + next.cost < distance[next.to]){
+                    
+                    distance[next.to] = current.cost + next.cost;
+                    pq.offer(new Edge(next.to, distance[next.to]));
                 }
             }
         }
