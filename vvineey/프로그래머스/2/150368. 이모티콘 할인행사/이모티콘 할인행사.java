@@ -20,50 +20,54 @@ class Solution {
         });
 
         int[] rates = new int[emoticons.length];
+        int[] prices = new int[users.length];
 
-        dfs(rates, 0);
+        dfs(rates,prices, 0);
 
         return answer.poll();
     }
 
-    private void dfs(int[] rates, int idx) {
-
-        if (idx >= emoticons.length) {
-
-            int[] result = new int[2];
-
-            for (int j = 0; j < users.length; j++) {
+    private void dfs(int[] rates, int[] prices, int idx) {
+        
+        if (idx == emoticons.length){
+            //모든 이모티콘의 할인율 결정 -> 이모티콘 플러스 가입 여부 갱신 
+            
+            int [] result = new int[2];
+            
+            for (int i = 0; i < users.length; i++){
+                result[1] += prices[i];
                 
-                // System.out.println(j + "번째 사용자");
-
-                int price = 0;
-                for (int k = 0; k < emoticons.length; k++) {
-                    
-                // System.out.println(k + "번째 이모티콘");
-                    
-                    if (rates[k] >= users[j][0]) {
-                        // System.out.println("> 구매" );
-                        price += emoticons[k] * (100 - rates[k]) / 100;
-                    }
-                }
-
-                if (price >= users[j][1]) {
-                    // System.out.println(">> 가입" );
+                if (prices[i] >= users[i][1]){
                     result[0]++;
-                }
-                
-                else {
-                    result[1] += price;
+                    result[1] -= prices[i];
                 }
             }
-
+            
             answer.offer(result);
             return;
         }
-
-        for (int i = 0; i < 4; i++) {
+        
+        
+        for (int i = 0; i < 4; i++){
+            
             rates[idx] = sale_rate[i];
-            dfs(rates, idx + 1);
+            int price = emoticons[idx] * (100 - sale_rate[i]) / 100;
+            
+            for (int j = 0; j < users.length; j++){
+                if (rates[idx] >= users[j][0]) {
+                    prices[j] += price;
+                }  
+            }
+            
+            dfs(rates,prices, idx+1);
+            
+            for (int j = 0; j < users.length; j++){
+                if (rates[idx] >= users[j][0]) {
+                    prices[j] -= price;
+                }  
+            }
+
         }
+     
     }
 }
