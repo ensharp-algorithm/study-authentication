@@ -1,40 +1,39 @@
 import java.util.*;
 
 class Solution {
+    
+    int[] dy = { -1, 1, 0, 0 };
+    int[] dx = { 0, 0, -1, 1 };
 
     public int solution(int[][] maps) {
-        int[] dy = new int[] { -1, 1, 0, 0 };
-        int[] dx = new int[] { 0, 0, -1, 1 };
-        
         int n = maps.length;
         int m = maps[0].length;
-        
-        Queue<int[]> queue = new ArrayDeque<>();
         boolean[][] visited = new boolean[n][m];
-        queue.add(new int[]{ 0, 0, 1 });
+        Queue<int[]> q = new ArrayDeque<>();
+        
+        q.add(new int[] { 0, 0, 0 });
         visited[0][0] = true;
         
-        while(!queue.isEmpty()) {
-            int[] poll = queue.poll();
+        while(!q.isEmpty()) {
+            int[] poll = q.poll();
+            
+            if (poll[0] == n - 1 && poll[1] == m - 1) {
+                return poll[2] + 1;
+            }
             
             for (int i = 0; i < 4; i++) {
-                int curY = poll[0] + dy[i];
-                int curX = poll[1] + dx[i];
-                int cnt = poll[2];
+                int y = poll[0] + dy[i];
+                int x = poll[1] + dx[i];
                 
-                if (curY < 0 || curY >= n || curX < 0 || curX >= m || 
-                    visited[curY][curX] || maps[curY][curX] == 0)
+                if (y < 0 || y >= n || x < 0 || x >= m || visited[y][x] || maps[y][x] == 0) {
                     continue;
+                }
                 
-                // System.out.println(curY + " " + curX + " " + cnt);
-                
-                if (curY == n - 1 && curX == m - 1)
-                    return cnt + 1;
-                
-                visited[curY][curX] = true;
-                queue.add(new int[] { curY, curX, cnt + 1 });
+                q.add(new int[] { y, x, poll[2] + 1 });
+                visited[y][x] = true;
             }
         }
+        
         return -1;
     }
 }
