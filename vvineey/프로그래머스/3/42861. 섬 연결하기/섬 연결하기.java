@@ -1,48 +1,26 @@
 import java.util.*;
 
-
 class Solution {
     
-    static int n;
-    static int [][] costs;
-    static int [] root;
-    static int total;
+    static int[] root;
 
-    
     public int solution(int n, int[][] costs) {
-        this.n = n;
-        this.costs = costs;
         
-        init();
-        kruskal();
-       
-        return total;
-    }
-    
-        
-    private void init() {
-        
-        Arrays.sort(costs, (o1,o2) -> {
-           if (o1[2] != o2[2]){
-               return Integer.compare(o1[2], o2[2]);
-            }
-            
-            return Integer.compare(o1[0], o2[0]);
+        Arrays.sort(costs, (o1,o2)->{
+            return Integer.compare(o1[2],o2[2]);
         });
-
+       
         root = new int[n];
         
-        //초기화
         for (int i = 0; i < n; i++){
-            root[i] = i; 
+            root[i] = i;
         }
-        
-        this.total = 0;
+    
+        return kruskal(n, costs);
     }
     
     private int find(int x){
         
-        //최상위 루트
         if (root[x] == x){
             return x;
         }
@@ -50,40 +28,41 @@ class Solution {
         return root[x] = find(root[x]);
     }
     
-    private boolean union(int x, int y) {
+    private boolean union(int a, int b){
         
-        int rootX = find(x);
-        int rootY = find(y);
+        int rootA = find(a);
+        int rootB = find(b);
         
-         if (rootX == rootY){
+        if (rootA == rootB){
             return false;
         }
         
-        root[rootY] = rootX;
+        root[rootB] = rootA;
         return true;
     }
     
-    private void kruskal(){
+    private int kruskal(int n, int[][] costs){
         
+        int total = 0;
         int cnt = 0;
         
         for (int[] edge : costs){
-                        
-            //선택할 수 있는 최종 간선의 수 = n-1
+            
             if (cnt == n-1){
-                break;
+                return total;
             }
             
-            int v1 = edge[0];
-            int v2 = edge[1];
+            int a = edge[0];
+            int b = edge[1];
             int cost = edge[2];
-
-            //다른 집합이면 선택
-            if (union(v1,v2)) {
+            
+            if (union(a,b)){
                 total += cost;
+                // System.out.println(edge[0] + " " + edge[1]);
                 cnt++;
             }
-            // System.out.println(cnt + " 개 선택 : " + total);
-            }
         }
+        
+        return total;
+    }
 }
