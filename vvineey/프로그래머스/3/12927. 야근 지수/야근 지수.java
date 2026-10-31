@@ -1,43 +1,32 @@
 import java.util.*;
 
 class Solution {
-    
     public long solution(int n, int[] works) {
-       
-        PriorityQueue<Integer> pq = new PriorityQueue<>((o1,o2)->{
-            return Integer.compare(o2,o1);
-        });
+        
+        PriorityQueue<Integer> pq = new PriorityQueue<>(Collections.reverseOrder());
         
         for (int work : works){
             pq.offer(work);
         }
         
-        int cnt = 0;
-        
-        while (cnt < n && !pq.isEmpty()){
+        while  (n > 0) {
             
-            int tmp = pq.poll();
-            // System.out.println(tmp);
+            int work = pq.poll();
             
-            if (tmp > 0){
-                tmp--;
+            if (work == 0){
+                return 0;
             }
             
-            pq.offer(tmp);
-            cnt++;
+            work--;
+            n--;
+            pq.offer(work);
         }
-        
         
         long total = 0;
         
-        while (!pq.isEmpty()){
-            
-            int tmp = pq.poll();
-            
-            // System.out.println(" > " + tmp);
-            total += tmp*tmp;
+        for (int work : pq){
+            total += (long) (work * work);
         }
-        
         
         return total;
     }
