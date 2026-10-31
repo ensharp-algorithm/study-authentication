@@ -1,49 +1,31 @@
-import java.util.*;
-
 class Solution {
     public int solution(int[] players, int m, int k) {
         
-        int total = 0;
-
-        //시간대, 서버의 수 
-        HashMap <Integer, Integer> hm = new HashMap<>();
+        int result = 0;
+        int [] servers = new int[24]; 
         
-        for (int time = 0; time < 24; time++){
-             hm.put(time, 0);
-        }
-        
-        for (int time = 0; time < 24; time++){
+        for (int i = 0; i < players.length; i++){
             
-            int serverCnt = players[time] / m;
-            // System.out.println("시각 " + time);
-            // System.out.println("게임 이용자 수 " + players[time] + " 필요한 서버의 수 :  " + serverCnt);
-            
-            if (serverCnt == 0){
+            if (players[i] < m){
                 continue;
+                
             }
-        
-            int now = hm.get(time);
-            // System.out.println("현재 가지고 있는 서버 "+ now);
             
-            int diff = serverCnt - now;
-            
-            if (diff <= 0){
+            if (servers[i] >= getServerCount(players[i],m)) {
                 continue;
             }
             
-            for (int i = time; i < time+ k; i++){
-                if (i >= 24){
-                    break;
-                }
-                // System.out.println(" > " + i + " 시각에 " + diff + "만큼 증설");
-                hm.replace(i, (hm.get(i) + diff));
+            int add = getServerCount(players[i],m) - servers[i];
+             
+            for (int j = i; j < Math.min(i+k, players.length); j++){
+                servers[j] += add;
             }
-            
-            total += diff;
-            
-            System.out.println();
+            result+= add;
         }
-        
-        return total;
+        return result;
+    }
+    
+    private int getServerCount(int player, int m){
+        return player / m;
     }
 }
