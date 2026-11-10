@@ -1,78 +1,59 @@
 import java.util.*;
 
 class Solution {
-    static int[] dx = {0,0,-1,1};
-    static int[] dy = {1,-1,0,0};
+    
+    int[] dy = {1,-1,0,0};
+    int[] dx = {0,0,-1,1};
+    int[][] visited;
+    int n,m;
     
     public int solution(int[][] maps) {
-                
-        return bfs(maps, List.of(0,0));
+        
+        n = maps.length;
+        m = maps[0].length;
+        visited = new int[n][m];
+        
+        for (int [] row : visited){
+            Arrays.fill(row,-1);    
+        }
+        
+        bfs(maps, new int[]{0,0});
+        
+        return visited[n-1][m-1];
     }
     
-    private int bfs(int[][] maps, List<Integer> start){
+    private void bfs(int[][] maps, int[] start){
         
-        int n = maps.length;
-        int m = maps[0].length;
+        Queue<int[]> queue = new ArrayDeque<>();
         
-        boolean[][] visited = new boolean[n][m];
-        Queue<List<Integer>> queue = new ArrayDeque<>();
-        int[][][] parent = new int[n][m][2];
-    
-        visited[0][0] = true;
+        //
+        visited[start[0]][start[1]] = 1;
         queue.offer(start);
         
         while(!queue.isEmpty()){
-            List<Integer> curr = queue.poll();
-            
-            if (curr.get(0) == n-1 && curr.get(1) == m-1){
-                System.out.println("도착");
-                return getDistance(parent,n,m);
-            }
+            int[] current = queue.poll();
+            int y = current[0];
+            int x = current[1];
+            int cnt = visited[y][x];
             
             for (int i = 0; i < 4; i++){
-                int nextY = curr.get(0) + dy[i];
-                int nextX = curr.get(1) + dx[i];
+                int nextY = y + dy[i];
+                int nextX = x + dx[i];
+                int nextCnt = cnt + 1;
                 
-                if (nextX < 0 || nextY < 0 || nextY >= n || nextX >= m){
+                if (nextY < 0 || nextX < 0 || nextY >= n || nextX >= m){
                     continue;
                 }
-                if (visited[nextY][nextX] || maps[nextY][nextX] == 0){
+                
+                if (maps[nextY][nextX] == 0 || visited[nextY][nextX] > -1){
                     continue;
                 }
                 
-                parent[nextY][nextX][0] = curr.get(0);
-                parent[nextY][nextX][1] = curr.get(1);
-                
-                visited[nextY][nextX] = true;
-                queue.offer(List.of(nextY,nextX));
+                visited[nextY][nextX] = nextCnt;
+                queue.offer(new int[]{nextY, nextX});
             }
         }
         
-        return -1;
     }
     
-    private int getDistance(int[][][] parent, int n, int m){
-        
-        int y = n-1;
-        int x = m-1;
-        
-        int cnt = 0;
-        
-        while(true){
-            
-            // System.out.println(y + " " + x);
-            
-            if (x == 0 && y == 0){
-                break;
-            }
-            
-            
-            int prevY = parent[y][x][0];
-            int prevX = parent[y][x][1];
-            y = prevY;
-            x = prevX;
-            cnt++;
-        }
-        return (cnt+1);     
-    }
 }
