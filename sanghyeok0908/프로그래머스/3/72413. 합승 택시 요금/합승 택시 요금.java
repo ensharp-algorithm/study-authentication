@@ -2,12 +2,11 @@ import java.util.*;
 
 class Solution {
     
-    int n;
     List<int[]>[] edges;
     
     public int solution(int n, int s, int a, int b, int[][] fares) {
-        this.n = n;
-        this.edges = new ArrayList[n + 1];
+        edges = new ArrayList[n + 1];
+        
         for (int i = 1; i <= n; i++) {
             edges[i] = new ArrayList<>();
         }
@@ -17,45 +16,44 @@ class Solution {
             edges[f[1]].add(new int[] { f[0], f[2] });
         }
         
-        int answer = Integer.MAX_VALUE;
-        int[] distS = dijkstra(s);
-        int[] distA = dijkstra(a);
-        int[] distB = dijkstra(b);
+        int[] sDist = dijkstra(n, s);
+        int[] aDist = dijkstra(n, a);
+        int[] bDist = dijkstra(n, b);
+        int min = sDist[a] + sDist[b];
         
         for (int i = 1; i <= n; i++) {
-            int cCost = distS[i];
-            int aCost = distA[i];
-            int bCost = distB[i];
-            
-            if (aCost != Integer.MAX_VALUE && bCost != Integer.MAX_VALUE && cCost != Integer.MAX_VALUE)
-                answer = Math.min(answer, aCost + bCost + cCost);
+            int temp = sDist[i] + aDist[i] + bDist[i];
+            min = Math.min(min, temp);
         }
-        
-        return answer;
+        return min;
     }
     
-    int[] dijkstra(int s) {
+    int[] dijkstra(int n, int s) {
         int[] dist = new int[n + 1];
-        Queue<int[]> queue = new PriorityQueue<>((o1, o2) -> {
-            return Integer.compare(o1[1], o2[1]);
+        Queue<int[]> q = new PriorityQueue<>((o1, o2) -> {
+            if (o1[1] != o2[1]) {
+                return Integer.compare(o1[1], o2[1]);
+            }
+            return Integer.compare(o1[0], o2[0]);
         });
         
         Arrays.fill(dist, Integer.MAX_VALUE);
         dist[s] = 0;
-        queue.add(new int[] { s, 0 });
+        q.add(new int[] { s, 0 });
         
-        while(!queue.isEmpty()) {
-            int[] poll = queue.poll();
+        while(!q.isEmpty()) {
+            int[] cur = q.poll();
             
-            if (dist[poll[0]] < poll[1])
+            if (dist[cur[0]] < cur[1]) {
                 continue;
+            }
             
-            for (int[] near : edges[poll[0]]) {
-                int cost = poll[1] + near[1];
+            for (int[] near : edges[cur[0]]) {
+                int nextCost = cur[1] + near[1];
                 
-                if (dist[near[0]] > cost) {
-                    dist[near[0]] = cost;
-                    queue.add(new int[] { near[0], cost });
+                if (dist[near[0]] > nextCost) {
+                    dist[near[0]] = nextCost;
+                    q.add(new int[] { near[0], nextCost });
                 }
             }
         }

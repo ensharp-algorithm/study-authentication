@@ -2,55 +2,49 @@ import java.util.*;
 
 class Solution {
     
-    List<Integer>[] tree;
-    int maxSheep = 0;
+    int n;
+    List<Integer>[] list;
+    int answer = 0;
     
     public int solution(int[] info, int[][] edges) {
-        tree = new ArrayList[info.length];
+        n = info.length;
+        list = new ArrayList[n];
         
-        for (int i = 0; i < info.length; i++) {
-            tree[i] = new ArrayList<>();
+        for (int i = 0; i < n; i++) {
+            list[i] = new ArrayList<>();
         }
         
-        for (int i = 0; i < edges.length; i++) {
-            tree[edges[i][0]].add(edges[i][1]);
+        for (int[] edge : edges) {
+            list[edge[0]].add(edge[1]);
         }
         
-        List<Integer> next = new ArrayList<>();
-        next.add(0);
-        recursion(info, 0, 0, 0, next);
-        return maxSheep;
+        List<Integer> l = new LinkedList<>();
+        l.add(0);
+        
+        dfs(info, l, 0, 0, 0);
+        return answer;
     }
     
-    void recursion(int[] info, int cur, int sheep, int wolf, List<Integer> next) {
+    void dfs(int[] info, List<Integer> nexts, int cur, int sheep, int wolf) {
         if (info[cur] == 0) {
             sheep++;
         } else {
             wolf++;
         }
         
-        if (wolf >= sheep) {
+        if (sheep <= wolf) {
             return;
         }
         
-        maxSheep = Math.max(maxSheep, sheep);
+        answer = Math.max(answer, sheep);
         
-        List<Integer> newNext = new ArrayList<>(next);
-        newNext.remove(Integer.valueOf(cur));
+        List<Integer> copy = new ArrayList<>(nexts);
         
-        if (tree[cur] != null) {
-            newNext.addAll(tree[cur]);
-        }
+        copy.remove(Integer.valueOf(cur));
+        copy.addAll(list[cur]);
         
-        // System.out.printf("cur = %d, sheep = %d, wolf = %d\n", cur, sheep, wolf);
-        // System.out.println("child node = ");
-        // for (Integer i : newNext) {
-        //     System.out.print(i + " ");
-        // }
-        // System.out.println();
-        
-        for (Integer child : newNext) {
-            recursion(info, child, sheep, wolf, newNext);
+        for (int next : copy) {
+            dfs(info, copy, next, sheep, wolf);
         }
     }
 }

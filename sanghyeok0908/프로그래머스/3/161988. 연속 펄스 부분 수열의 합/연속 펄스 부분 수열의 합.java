@@ -1,23 +1,30 @@
 class Solution {
     
-    int n;
-    
     public long solution(int[] sequence) {
-        n = sequence.length;
+        int n = sequence.length;
+        int[] arr1 = new int[n], arr2 = new int[n];
         
-        long max = 0, min = 0;
-        int pulse = 1;
-        long cur = 0;
         for (int i = 0; i < n; i++) {
-            cur += sequence[i] * pulse;
+            arr1[i] = sequence[i];
+            arr2[i] = sequence[i];
             
-            max = Math.max(max, cur);
-            min = Math.min(min, cur);
-            
-            // System.out.printf("i = %d, cur = %d, max = %d, min = %d\n", i, cur, max, min);
-            pulse *= -1;
+            if (i % 2 != 0) {
+                arr1[i] *= -1;
+            } else {
+                arr2[i] *= -1;
+            }
         }
+
+        long cur1 = arr1[0], cur2 = arr2[0];
+        long answer = Math.max(cur1, cur2);
         
-        return max - min;
+        for (int i = 1; i < n; i++) {
+            cur1 = Math.max(arr1[i], cur1 + arr1[i]);
+            cur2 = Math.max(arr2[i], cur2 + arr2[i]);
+            
+            answer = Math.max(answer, cur1);
+            answer = Math.max(answer, cur2);
+        }
+        return answer;
     }
 }
