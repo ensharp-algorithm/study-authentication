@@ -2,77 +2,56 @@ import java.util.*;
 
 class Solution {
     
-    class Node {
-        int y, x, dy, dx, dir, cost;
-        Node(int y, int x, int dir, int cost) {
-            this.y = y;
-            this.x = x;
-            this.dir = dir;
-            this.cost = cost;
-        }
-    }
-    
     int[] dy = new int[] { -1, 1, 0, 0 };
     int[] dx = new int[] { 0, 0, -1, 1 };
-    int[][] board;
-    int n;
-    
+
     public int solution(int[][] board) {
-        this.board = board;
-        n = board.length;
+        int n = board.length;
+        Queue<int[]> queue = new ArrayDeque<>();
+        int[][][] costs = new int[n][n][4];
         
-        int answer = Integer.MAX_VALUE;
-        Queue<Node> queue = new ArrayDeque<>();
-        int[][][] costMatrix = new int[n][n][4];
-        
-        queue.add(new Node(0, 0, -1, 0));
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
-                Arrays.fill(costMatrix[i][j], Integer.MAX_VALUE);
+                Arrays.fill(costs[i][j], Integer.MAX_VALUE);   
             }
         }
+        
+        Arrays.fill(costs[0][0], 0);
+        queue.add(new int[] { 0, 0, -1, 0 }); // y, x, dir, cost
         
         while(!queue.isEmpty()) {
-            Node node = queue.poll();
-            
-            if (node.y == n - 1 && node.x == n - 1) {
-                answer = Math.min(answer, node.cost);
-            }
+            int[] poll = queue.poll();
             
             for (int i = 0; i < 4; i++) {
-                int curY = node.y + dy[i];
-                int curX = node.x + dx[i];
-                boolean isCurve = false;
+                int y = poll[0] + dy[i];
+                int x = poll[1] + dx[i];
                 
-                if (!isIn(curY, curX) || 
-                    board[curY][curX] == 1) {
+                if (y < 0 || y >= n || x < 0 || x >= n || 
+                    board[y][x] == 1) {
                     continue;
                 }
                 
-                if (node.dir != -1 && node.dir != i) {
-                    isCurve = true;
+                int cost = poll[3] + 100;
+                
+                if (poll[2] != -1 && poll[2] != i) {
+                    cost += 500;
                 }
                 
-                int curCost = node.cost + 100;
-                if (isCurve) {
-                    curCost += 500;
-                }
-                
-                if (costMatrix[curY][curX][i] < curCost) {
+                if (costs[y][x][i] <= cost) {
                     continue;
                 }
                 
-                Node curNode = new Node(curY, curX, i, curCost);
-                queue.add(curNode);
-                costMatrix[curY][curX][i] = curCost;
-                // System.out.printf("y = %d, x = %d, dir = %d, cost = %d\n", curY, curX, i, curCost);   
+                // System.out.printf("cur=(%d,%d), prev=(%d,%d), morePrev=(%d,%d), cost=%d\n", y, x, poll[0], poll[1], poll[2], poll[3], cost);
+                
+                costs[y][x][i] = cost;
+                queue.add(new int[] { y, x, i, cost });
             }
         }
         
+        int answer = Integer.MAX_VALUE;
+        for (int i = 0; i < 4; i++) {
+            answer = Math.min(answer, costs[n - 1][n - 1][i]);
+        }
         return answer;
-    }
-    
-    boolean isIn(int y, int x) {
-        return y >= 0 && y < n && x >= 0 && x < n;
     }
 }
