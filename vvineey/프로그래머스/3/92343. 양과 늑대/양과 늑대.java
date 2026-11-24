@@ -1,51 +1,59 @@
 import java.util.*;
 
 class Solution {
-    static int answer = 0;
+    
+    int answer; 
+    boolean[] visited;
+    int[] parents;
     
     public int solution(int[] info, int[][] edges) {
         
-        Solution.answer = 0;
-        int[] parent = new int[info.length];
-
+        int n = info.length;
+        answer = Integer.MIN_VALUE;
+        visited = new boolean[n];
+        parents = new int[n];
         
-        for (int[] edge : edges){
-            parent[edge[1]] = edge[0];
+        for (int [] edge : edges){
+            parents[edge[1]] = edge[0];
         }
         
-        boolean[] visited = new boolean[info.length];
-        int[] state = new int[]{1,0};
+        parents[0] = 0;
         visited[0] = true;
         
-        dfs(info, visited,parent, state, 0,0);
-
+        dfs(info, 0, new int[]{1,0});
+        
         return answer;
     }
     
-    private void dfs(int[] info, boolean [] visited,int[] parent, int[] state, int idx, int depth){
+    
+    private void dfs(int[] info, int depth, int[] status){
         
-        answer = Math.max(answer, state[0]);
+        //모든 가지마다 양의 수 비교
+        answer = Math.max(answer, status[0]);
         
-        if (depth >= info.length){
+        if (depth == info.length){
             return;
         }
         
-        for (int next = 1; next < info.length; next++){
+        for (int i = 1; i < info.length; i++){
             
-            if (visited[next] || !visited[parent[next]]) continue;
-            
-            if (info[next] == 1 && state[0] <= state[1] + 1){
+            if (visited[i] || !visited[parents[i]]){
                 continue;
             }
             
-            state[info[next]]++;
-            visited[next] = true;
+            if (status[0] == status[1] + info[i]){
+                continue;
+            }
             
-            dfs(info, visited,parent, state, next, depth+1);
+            //선택
+            visited[i] = true;
+            status[info[i]]++;
             
-            state[info[next]]--;
-            visited[next] = false;
-
+            dfs(info, depth +1, status);
+            
+            //미선택
+            visited[i] = false;
+            status[info[i]]--;
         }
     }
 }
