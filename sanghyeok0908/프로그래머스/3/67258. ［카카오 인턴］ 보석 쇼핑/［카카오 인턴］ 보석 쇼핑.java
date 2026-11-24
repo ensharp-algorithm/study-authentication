@@ -4,36 +4,37 @@ class Solution {
     
     public int[] solution(String[] gems) {
         Set<String> set = new HashSet<>();
+        Map<String, Integer> map = new HashMap<>();
+        int start = 0, cnt = 0;
+        int[] answer = { 0, gems.length };
+        
         for (String g : gems) {
             set.add(g);
         }
         
-        // System.out.println("size=" + set.size());
-        
-        Queue<int[]> answer = new PriorityQueue<>((o1, o2) -> {
-            if (o1[1] - o1[0] != o2[1] - o2[0]) {
-                return Integer.compare(o1[1] - o1[0], o2[1] - o2[0]);
-            }
-            return Integer.compare(o1[0], o2[0]);
-        });
-        Map<String, Integer> map = new HashMap<>();
-        for (int i = 0, start = 0; i < gems.length; i++) {
+        for (int i = 0; i < gems.length; i++) {
             map.put(gems[i], map.getOrDefault(gems[i], 0) + 1);
             
-            // System.out.println("gem=" + gems[i] + ", cnt=" + map.get(gems[i]));
+            if (map.get(gems[i]) == 1) {
+                cnt++;
+            }
             
-            while (start < i && map.get(gems[start]) > 1) {
-                // System.out.println("increase startPoint " + start);
+            while(start < i && map.get(gems[start]) > 1) {
                 map.put(gems[start], map.get(gems[start]) - 1);
                 start++;
             }
             
-            if (map.size() == set.size()) {
-                // System.out.println("answer add " + (start + 1) + " " + (i + 1));
-                answer.add(new int[] { start + 1, i + 1 });    
+            if (cnt == set.size()) {                
+                if (i - start < answer[1] - answer[0]) {
+                    answer[0] = start + 1;
+                    answer[1] = i + 1;    
+                }
+                
+                map.put(gems[start], 0);
+                cnt--;
+                start++;
             }
         }
-        
-        return answer.poll();
+        return answer;
     }
 }
