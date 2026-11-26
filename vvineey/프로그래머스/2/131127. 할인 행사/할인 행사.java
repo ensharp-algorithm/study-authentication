@@ -22,8 +22,8 @@ class Solution {
         
         int cnt = 0;
         int answer = 0;
-        
         boolean flag = true;
+        
         for (int value : hm.values()) {
             if (value != 0){
                    flag = false;
